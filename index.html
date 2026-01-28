@@ -1,0 +1,3863 @@
+<!doctype html>
+<html lang="ru">
+<head>
+   <base href="./">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matrix Cat: Office Noir — Prototype</title>
+   <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<!-- Дисклеймер -->
+<div id="disclaimer" class="disclaimer" style="display:none;">
+    <div class="disclaimer-content">
+        <div id="disclaimerText" class="disclaimer-text"></div>
+     
+<button id="disclaimerBtn" class="disclaimer-btn">Ознакомлен</button>
+
+    </div>
+</div>
+
+
+
+<!-- Кодовый замок -->
+<div id="doorLock" class="door-lock" style="display:none;">
+  <div class="lock-overlay"></div>
+  <div class="lock-container">
+    <h2>Дверь заблокирована</h2>
+    <p class="lock-hint">Зажмите три цифры одновременно</p>
+    <div class="lock-buttons">
+      <button class="lock-btn" data-digit="1">1</button>
+      <button class="lock-btn" data-digit="2">2</button>
+      <button class="lock-btn" data-digit="3">3</button>
+      <button class="lock-btn" data-digit="4">4</button>
+      <button class="lock-btn" data-digit="5">5</button>
+      <button class="lock-btn" data-digit="6">6</button>
+      <button class="lock-btn" data-digit="7">7</button>
+      <button class="lock-btn" data-digit="8">8</button>
+      <button class="lock-btn" data-digit="9">9</button>
+      <button class="lock-btn" data-digit="0">0</button>
+    </div>
+    <p class="lock-status"></p>
+  </div>
+</div>
+
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+  <style>
+
+    /* Оверлей перехода между эпизодами */
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10000; /* Поверх всего */
+  transition: opacity 1s ease-in-out;
+}
+
+.transition-overlay.active {
+  opacity: 1;
+  pointer-events: all; /* Блокирует клики во время перехода */
+}
+
+/* КОФЕ-ИГРА */
+#coffeeGame {
+  display: none;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999 !important;
+}
+
+#coffeeGame .coffee-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+#coffeeGame .coffee-container {
+  position: relative;
+  background: linear-gradient(145deg, #2a2420, #1a1410);
+  border: 3px solid var(--accent);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(255, 217, 59, 0.4);
+  max-width: 700px;
+  width: 90%;
+}
+
+#coffeeGame h2 {
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+#coffeeGame .coffee-hint {
+  color: #ffd93b;
+  font-size: 16px;
+  margin-bottom: 30px;
+  min-height: 24px;
+}
+
+#coffeeGame .coffee-cup-area {
+  position: relative;
+  width: 200px;
+  height: 250px;
+  margin: 0 auto 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#coffeeGame .coffee-cup {
+  width: 180px;
+  height: 220px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+#coffeeGame .cup-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 217, 59, 0) 0%, rgba(255, 217, 59, 0) 70%);
+  pointer-events: none;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+#coffeeGame .cup-glow.active {
+  background: radial-gradient(circle, rgba(255, 217, 59, 0.3) 0%, rgba(255, 217, 59, 0) 70%);
+  box-shadow: 0 0 40px rgba(255, 217, 59, 0.6);
+}
+
+#coffeeGame .coffee-ingredients {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+#coffeeGame .ingredient {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+#coffeeGame .ingredient:active {
+  cursor: grabbing;
+}
+
+#coffeeGame .ingredient.used {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+#coffeeGame .ingredient img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  transition: transform 0.2s ease;
+}
+
+#coffeeGame .ingredient:hover img {
+  transform: scale(1.1);
+}
+
+#coffeeGame .ingredient span {
+  color: #ccc;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+#coffeeGame .coffee-status {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#coffeeGame #coffeeProgress {
+  color: #4ade80;
+}
+
+#coffeeGame .coffee-cup.pour {
+  animation: pourIngredient 0.5s ease;
+}
+
+@keyframes pourIngredient {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+
+/* Оверлей замка */
+.door-lock {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+/* Контейнер замка */
+.lock-container {
+  position: relative;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 3px solid var(--accent);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(255, 217, 59, 0.4);
+  max-width: 500px;
+}
+
+.lock-container h2 {
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.lock-hint {
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+/* Кнопки замка */
+.lock-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.lock-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+  border: 2px solid #555;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+/* Hover */
+.lock-btn:hover {
+  background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
+  border-color: var(--accent);
+  box-shadow: 
+    0 0 20px rgba(255, 217, 59, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Активная (зажатая) кнопка */
+.lock-btn.pressed {
+  background: linear-gradient(145deg, #ffd93b, #f0c020);
+  color: #000;
+  border-color: #ffd93b;
+  transform: translateY(4px);
+  box-shadow: 
+    0 0 30px rgba(255, 217, 59, 0.8),
+    inset 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* Статус */
+.lock-status {
+  color: var(--accent);
+  font-size: 16px;
+  min-height: 24px;
+}
+  
+/* Мини-игра взлома сейфа */
+.minigame-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.safeCrack-window {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 217, 59, 0.2);
+    text-align: center;
+}
+
+.safeCrack-window h2 {
+    font-family: var(--font);
+    font-size: 28px;
+    color: var(--accent);
+    margin: 0 0 40px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Контейнер с дисками */
+.combination-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Колонка одного диска */
+.disk-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Стрелки */
+.disk-arrow {
+    width: 60px;
+    height: 40px;
+    background: rgba(255, 217, 59, 0.1);
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Arial, sans-serif;
+}
+
+.disk-arrow:hover {
+    background: var(--accent);
+    color: #0a0a0a;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(255, 217, 59, 0.4);
+}
+
+.disk-arrow:active {
+    transform: scale(0.95);
+}
+
+/* Дисплей цифры */
+.digit-display {
+    width: 80px;
+    height: 100px;
+    background: #0a0a0a;
+    border: 3px solid rgba(255, 217, 59, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 52px;
+    font-weight: 700;
+    color: rgba(255, 217, 59, 0.6);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.digit-display:hover {
+    border-color: rgba(255, 217, 59, 0.6);
+}
+
+/* Активная позиция */
+.digit-display.active {
+    border-color: #fff;
+    color: var(--accent);
+    box-shadow: 0 0 25px rgba(255, 217, 59, 0.8), inset 0 2px 10px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 15px rgba(255, 217, 59, 0.6);
+}
+
+/* Инструкция */
+.instruction {
+    font-family: var(--font);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 30px;
+    padding: 15px;
+    background: rgba(255, 217, 59, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 217, 59, 0.2);
+}
+
+.instruction strong {
+    color: var(--accent);
+}
+
+/* Кнопки */
+.safeCrack-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.safeCrack-buttons button {
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+    box-shadow: 0 4px 15px rgba(255, 217, 59, 0.4);
+}
+
+.btn-primary:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 217, 59, 0.6);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 217, 59, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Анимация тряски при неверном коде */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.4s ease;
+}
+
+
+
+    .model-viewer {
+  position: fixed;
+  inset: 0;
+  background-image: url('assets/img/background2.png'); /* ← Путь к картинке */
+  background-size: cover; /* Растягивает на весь экран */
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.model-viewer.open {
+  display: flex;
+}
+
+.model-canvas {
+  width: 80vw;
+  max-width: 900px;
+  height: 65vh;
+  border: 2px solid var(--neon);
+  border-radius: 16px;
+  background: 
+    linear-gradient(rgba(20, 20, 20, 0.7), rgba(10, 10, 10, 0.9)),
+    url('assets/img/pattern3.png') center/cover; 
+  box-shadow: 0 0 40px rgba(255, 217, 59, 0.3);
+}
+
+.model-info {
+  margin-top: 20px;
+  text-align: center;
+  max-width: 600px;
+  
+  /* ✅ ДОБАВЛЯЕМ ЗАТЕМНЁННУЮ ПОДЛОЖКУ: */
+  background: rgba(50, 50, 40, 0.85); /* Серо-коричневый полупрозрачный */
+  padding: 12px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px); /* Размытие фона за подложкой */
+}
+
+
+.model-info h2 {
+  color: var(--neon);
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.model-info p {
+  color: #ffd93b; 
+  line-height: 1.5;
+}
+
+.model-close {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border: 2px solid var(--neon);
+  border-radius: 10px;
+  color: var(--neon);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 101;
+}
+
+.model-close:hover {
+  background: var(--neon);
+  color: #000;
+  box-shadow: 0 0 20px var(--ring);
+}
+
+.model-hint {
+  margin-top: 15px;
+  font-size: 13px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+    :root{
+      --bg:#0b0b0d; --panel:#141418; --panel-2:#1b1b22; --text:#e7e7e7; --neon:#ffd93b; --muted:#8b8b95;
+      --ring: rgba(255, 217, 59, .35);
+    }
+    html,body{height:100%;}
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text);}
+    .game-root{position:relative; width:100%; height:100vh; overflow:hidden;}
+   /* Контейнер сцены с фиксированным соотношением сторон */
+/* ✅ НОВЫЙ КОД: */
+
+/* Контейнер сцены занимает весь экран */
+.scene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Фон сохраняет пропорции, масштабируется без обрезки */
+.bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000 center/contain no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 60% at 50% 42%, transparent, rgba(0,0,0,.55));
+    pointer-events: none;
+}
+
+/* Предметы позиционируются в пикселях относительно фона */
+.obj {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    
+    /* ✅ Контейнер НЕ реагирует на события */
+    pointer-events: none;
+    
+    display: inline-block;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+}
+
+.obj img {
+    max-width: 8vw;
+    min-width: 40px;
+    width: auto;
+    height: auto;
+    display: block;
+    image-rendering: auto;
+    
+    /* ✅ Только изображение реагирует */
+    pointer-events: auto;
+    cursor: pointer;
+    
+    filter: drop-shadow(0 0 0 rgba(255,217,59,0));
+    transition: filter .15s ease;
+}
+
+.obj img:hover {
+    filter: drop-shadow(0 0 8px rgba(255,217,59,.7)) drop-shadow(0 0 16px rgba(255,217,59,.3));
+}
+
+
+/* Анимация ошибки (встряхивание) */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+
+
+    .main-menu{position:absolute; inset:0; display:grid; place-items:center; background:#000 url('assets/img/menu_back2.jpg') center/cover no-repeat; z-index:50}
+    .menu-card{background:rgba(20,20,24,.35); padding:14px 18px; border-radius:14px; width:min(520px, 92vw); box-shadow:0 12px 30px rgba(0,0,0,.45); backdrop-filter: blur(2px);}
+    .menu-card h1{margin:0 0 6px; font-weight:750; letter-spacing:.5px}
+    .menu-card p{margin:2px 0 12px; color:var(--text)}
+    .menu-grid{display:grid; gap:8px}
+    .menu-card a {
+  color: #ffd93b;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.menu-card a:hover {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,217,59,0.6);
+}
+
+    .btn{appearance:none; border:0; border-radius:12px; padding:12px 14px; background:rgba(27,27,34,.55); color:var(--text); cursor:pointer; transition:.15s}
+    .btn:hover{outline:2px solid var(--ring); background:rgba(27,27,34,.7)}
+    .row{display:flex; gap:8px}
+    input[type=text], select{width:100%; background:#101015; color:var(--text); border:1px solid #2a2a33; border-radius:10px; padding:10px 12px; box-sizing: border-box;}
+    .hint{font-size:12px; color:#a1a1aa}
+    .hud{position:absolute; top:16px; right:16px; display:flex; gap:10px; align-items:center; z-index:30}
+  .icon-btn {
+  background: rgba(20,20,24,.65);
+  border: 1px solid #2a2a33;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  opacity: .9;
+  transform: scale(1.3);
+  /* ✅ Желтая иконка */
+  color: #ffd93b;
+  filter: brightness(1.2);
+}
+
+.icon-btn:hover {
+  outline: 2px solid var(--ring);
+  filter: brightness(1.5);
+}
+
+
+    .inventory {
+  position: absolute; 
+  top: 16px; 
+  left: 16px; 
+  background: #2a1f14 url('assets/img/diplomat_leather.jpg') center/cover no-repeat; 
+  border: 4px solid #3b2a1a; 
+  border-radius: 16px; 
+  width: 480px;  /* ⬅️ Фиксированная ширина для 4 столбцов */
+  max-height: 85vh; 
+  z-index: 25; 
+  box-shadow: inset 0 0 40px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5); 
+  display: none;
+  overflow: hidden;  /* ⬅️ Запрет выхода за границы */
+}
+
+.inventory.open {
+  display: block;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 217, 59, 0.2);
+  gap: 10px;
+}
+
+.inventory-header strong {
+  font-size: 18px;
+  color: var(--neon);
+}
+
+.inventory-header .hint {
+  font-size: 10px;
+  color: #888;
+  font-style: italic;
+  flex: 1; /* Растягивается между названием и очками */
+}
+
+.inventory-header .points {
+  color: #ffd93b;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 0 0 10px rgba(255, 217, 59, 0.6);
+  white-space: nowrap; /* Не переносится */
+}
+
+
+.grid {
+  display: grid; 
+  grid-template-columns: repeat(5, 1fr);  /* ⬅️ 5 столбца */
+  gap: 8px; 
+  padding: 12px;
+}
+
+.cell {
+  border: 1px solid rgba(255,255,255,.08); 
+  aspect-ratio: 1/1;  /* ⬅️ Квадратная ячейка */
+  border-radius: 10px; 
+  display: flex;  /* ⬅️ Изменено с grid на flex */
+  align-items: center;  /* ⬅️ Центрирование по вертикали */
+  justify-content: center;  /* ⬅️ Центрирование по горизонтали */
+  background: rgba(0,0,0,.15);
+  padding: 5px;  /* ⬅️ Небольшой отступ внутри */
+  box-sizing: border-box;
+  position: relative;
+}
+
+.cell img {
+  max-width: 100%;  /* ⬅️ Изменено с 90% на 100% */
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;  /* ⬅️ КЛЮЧЕВОЕ — вписывает БЕЗ обрезки */
+  object-position: center;
+  display: block;
+}
+
+
+
+/* ✅ ЗАТЕМНЕНИЕ ФОНА */
+.ctx {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 280px;
+    max-width: 420px;
+    background: var(--panel);
+    border: 1px solid #2a2a33;
+    border-radius: 14px;
+    padding: 16px;
+    z-index: 40;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    pointer-events: auto; /* ← Добавь */
+    will-change: transform; /* ← Добавь для GPU */
+}
+
+/* ✅ ВАЖНО: Запрети влияние на layout */
+.ctx::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: -1;
+    backdrop-filter: blur(4px);
+    pointer-events: none; /* ← Не влияет на клики */
+}
+
+    .ctx h3{margin:0 0 6px; font-size:16px}
+    .ctx p{margin:0 0 10px; color:var(--muted)}
+    .ctx .row{justify-content:flex-end}
+    .dialog{position:absolute; left:50%; bottom:24px; transform:translateX(-50%); width:min(960px, 88vw); display:flex; gap:12px; align-items:flex-start; z-index:35}
+    .portrait{width:56px; height:56px; border-radius:50%; overflow:hidden; flex:0 0 auto; border:2px solid var(--neon); box-shadow:0 0 12px var(--ring)}
+    .portrait img{width:100%; height:100%; object-fit:cover}
+    .bubble{flex:1; background:var(--panel); border:1px solid #2a2a33; border-radius:14px; padding:12px 14px; box-shadow:0 10px 30px rgba(0,0,0,.45)}
+    .typewriter{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; color:var(--neon); line-height:1.4}
+    .choices{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
+    .ep-title{position:absolute; inset:0; display:grid; place-items:center; z-index:45; pointer-events:none; opacity:0; transition:opacity .6s ease}
+    .ep-title.show{opacity:1}
+    .ep-pill{padding:10px 16px; border-radius:999px; background:rgba(0,0,0,.5); border:1px solid var(--ring); color:var(--neon); font-weight:600}
+    .score-pop{position:absolute; left:50%; top:45%; transform:translate(-50%,-50%); color:var(--neon); font-weight:800; font-size:52px; opacity:0; animation: popFade 3.5s ease forwards}
+    @keyframes popFade{0%{opacity:0; transform:translate(-50%,-50%) scale(.9)}20%{opacity:1; transform:translate(-50%,-50%) scale(1)}100%{opacity:0; transform:translate(-50%,-70%) scale(1.05)}}
+    #goldDiggerBanner{position:fixed; left:50%; top:40%; transform:translate(-50%,-50%); font-size:56px; font-weight:900; color:#ffd700; text-shadow: 
+    -2px -2px 0 #555,
+    2px -2px 0 #555,
+    -2px 2px 0 #555,
+    2px 2px 0 #555,
+    0 0 16px #ffef99, 
+    0 0 28px #e0b500;
+  letter-spacing: 3px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  animation: goldFlash 1.8s ease-out forwards;
+}
+    @keyframes goldFlash{0%{opacity:0; transform:translate(-50%,-50%) scale(.9)}10%{opacity:1; transform:translate(-50%,-50%) scale(1)}60%{text-shadow:0 0 22px #fff3b0, 0 0 40px #ffc400}100%{opacity:0; transform:translate(-50%,-70%) scale(1.05)}}
+    body.menu-open #scene, body.menu-open #hud, body.menu-open #dialog { visibility: hidden !important; }
+body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #dialog { visibility: visible !important; }
+
+    #mainMenu .menu-card h1, #mainMenu .menu-card p, #mainMenu .menu-card label, #mainMenu .menu-card .hint, #mainMenu .btn {text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;}
+ @keyframes goldFlash{0%{opacity:0; transform:translate(-50%,-50%) scale(.9)}10%{opacity:1; transform:translate(-50%,-50%) scale(1)}60%{text-shadow:0 0 22px #fff3b0, 0 0 40px #ffc400}100%{opacity:0; transform:translate(-50%,-70%) scale(1.05)}}
+
+@keyframes rarityFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}85%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(0.9)}}
+
+body.menu-open #scene, body.menu-open #hud, body.menu-open #dialog { visibility: hidden !important; }
+body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #dialog { visibility: visible !important; }
+
+#mainMenu .menu-card h1, #mainMenu .menu-card p, #mainMenu .menu-card label, #mainMenu .menu-card .hint, #mainMenu .btn {text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;}
+.obj {
+  position: absolute; 
+  transform: translate(-50%,-50%); 
+  cursor: pointer; 
+  filter: drop-shadow(0 0 0 rgba(255,217,59,0)); 
+  transition: filter .15s ease;
+}
+
+.obj:hover {
+  filter: drop-shadow(0 0 12px rgba(255,217,59,.75)) drop-shadow(0 0 24px rgba(255,217,59,.35));
+}
+
+/* ⬇️ ДОБАВЬ ЭТО: */
+.obj img {
+  max-width: 12vw;
+  width: auto; 
+  height: auto; 
+  image-rendering: auto;
+}
+
+.ctx {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 280px; 
+  max-width: 420px;
+  background: var(--panel); 
+  border: 1px solid #2a2a33; 
+  border-radius: 14px; 
+  padding: 16px;
+  z-index: 40;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+.ctx h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.ctx p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+.ctx .row {
+  justify-content: flex-end;
+}
+
+/* Дисклеймер */
+.disclaimer {
+    position: fixed;
+    inset: 0;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.disclaimer.show {
+    opacity: 1;
+}
+
+/* Контейнер дисклеймера */
+.disclaimer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Центрирование по горизонтали */
+  text-align: center;
+  gap: 20px;
+}
+
+.disclaimer-text {
+    font-family: var(--font);
+    font-size: 18px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 60px;
+    min-height: 200px;
+}
+
+.disclaimer-btn {
+  margin: 20px auto 0; /* Центр по горизонтали */
+  display: block;
+  opacity: 0; /* Скрыта по умолчанию */
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.disclaimer-btn.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.disclaimer-btn:hover {
+    background: var(--accent);  /* ✅ Желтая при наведении */
+    color: #ffd93b;  /* ✅ Желтый текст при наведении */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 217, 59, 0.6);
+}
+
+
+.disclaimer-btn:active {
+    transform: scale(0.98);
+}
+
+
+#dialogText u {
+  text-decoration: none;
+  border-bottom: 2px solid #ffd93b;
+  padding-bottom: 2px;
+  text-shadow: 0 0 8px rgba(255, 217, 59, 0.4);
+  color: #ffd93b !important;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.inventory-header .points {
+  color: #ffd93b;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 0 0 10px rgba(255, 217, 59, 0.6);
+  margin-left: auto; /* Прижимает к правому краю */
+}
+
+.inventory-header .hint {
+  font-size: 10px;
+  color: #888;
+  font-style: italic;
+}
+
+/* ========== ТАБЛИЦА ЛИДЕРОВ ========== */
+.leaderboard-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.leaderboard-container {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+  border: 2px solid var(--neon);
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(255, 217, 59, 0.4);
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid var(--neon);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.leaderboard-header h2 {
+  margin: 0;
+  color: var(--neon);
+  font-size: 24px;
+}
+
+.leaderboard-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--neon);
+  font-size: 30px;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 217, 59, 0.2);
+  transform: rotate(90deg);
+}
+
+.leaderboard-content table {
+  width: 100%;
+  color: var(--text);
+  border-collapse: collapse;
+}
+
+.leaderboard-content th {
+  color: var(--neon);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid var(--neon);
+}
+
+.leaderboard-content td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 217, 59, 0.2);
+}
+
+.leaderboard-content tr:hover {
+  background: rgba(255, 217, 59, 0.1);
+}
+
+.leaderboard-content tr:first-child td {
+  color: gold;
+  font-weight: bold;
+}
+
+.leaderboard-content tr:nth-child(2) td {
+  color: silver;
+}
+
+.leaderboard-content tr:nth-child(3) td {
+  color: #cd7f32;
+}
+
+
+  </style>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+</head>
+<body>
+<div class="game-root" id="app">
+<div class="scene" id="scene">
+  <div class="bg" id="bg"></div>
+</div>
+
+
+  <div class="hud" id="hud">
+     <button class="icon-btn" id="btnInvToggle" title="Дипломат">💼</button>
+    <button class="icon-btn" id="btnMenu" title="Меню">☰</button>
+    <button class="icon-btn" id="btnSound" title="Звук">🔊</button>
+  </div>
+  <div class="inventory" id="inv">
+  <div class="inventory-header">
+    <strong>Дипломат</strong>
+    <span class="hint">noir collection</span>
+    <span class="points" id="inventoryPoints">0 pts</span>
+  </div>
+  
+  <!-- ✅ ДОБАВЬ ЭТО: -->
+  <div class="grid" id="invGrid"></div>
+</div>
+
+  <div class="dialog" id="dialog" style="display:none">
+    <div class="portrait"><img id="portrait" alt="portrait"></div>
+    <div class="bubble">
+      <div class="typewriter" id="dialogText"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+  </div>
+  <div class="ep-title" id="epTitle"><div class="ep-pill" id="epTitleText">Эпизод 1</div></div>
+  <div class="main-menu" id="mainMenu">
+    <div class="menu-card">
+      <h1>The cat Matrix's Office Noir*</h1>
+      <p>офисный нуар кота Матрикса</p>
+      <label>Никнейм/кличка/погоняло</label>
+      <input type="text" id="nickname" placeholder="from 3 to 12: [a-zA-Z0-9_]" maxlength="12" />
+      <div class="hint" style="margin:6px 0 12px">Допускается: латиница/цифры/нижнее подчёркивание, 3–12 символов.</div>
+      <div class="menu-grid">
+        <button class="btn" id="btnNew">Новая игра</button>
+        <button class="btn" id="btnContinue">Продолжить</button>
+        <button class="btn" id="btnInventory">Дипломат</button>
+        <button class="btn" id="btnLeaders">Таблица лидеров</button>
+        <button class="btn" id="btnPersona">Персонализация</button>
+        <button class="btn" id="btnAbout">Об авторе</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+// ========== FIREBASE CONFIG ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyC...",  // ← ВСТАВЬ СВОЙ
+  authDomain: "noir-game.firebaseapp.com",  // ← ВСТАВЬ СВОЙ
+  databaseURL: "https://matrix-noir-default-rtdb.europe-west1.firebasedatabase.app/",  // ← ВСТАВЬ СВОЙ
+  projectId: "noir-game",  // ← ВСТАВЬ СВОЙ
+  storageBucket: "noir-game.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+
+// Инициализация Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+console.log('🔥 Firebase подключен!');
+
+
+   
+// Функция печати текста с эффектом печатной машинки
+async function typeWriter(element, text, speed = 30) {
+    element.textContent = '';
+    for (let i = 0; i < text.length; i++) {
+        element.textContent += text[i];
+        await new Promise(resolve => setTimeout(resolve, speed));
+    }
+}
+
+// Показать дисклеймер
+async function showDisclaimer() {
+    const disclaimer = document.getElementById('disclaimer');
+    const disclaimerText = document.getElementById('disclaimerText');
+    const disclaimerBtn = document.getElementById('disclaimerBtn');
+    
+    // Показываем экран
+    disclaimer.style.display = 'flex';
+    setTimeout(() => disclaimer.classList.add('show'), 50);
+    
+    // Печатаем текст
+    await typeWriter(disclaimerText, DISCLAIMER_TEXT, 30);
+    
+    // Показываем кнопку
+   
+// ✅ НОВОЕ (без setTimeout, сразу после typeWriter)
+disclaimerBtn.style.display = 'block';
+disclaimerBtn.style.opacity = '1';
+disclaimerBtn.style.transform = 'translateY(0)';
+console.log('✅ Кнопка показана');
+ 
+    // Обработчик кнопки
+    disclaimerBtn.onclick = () => {
+        // Сохраняем что дисклеймер показан
+        state.disclaimerShown = true;
+        save();
+        
+        // Скрываем дисклеймер
+        disclaimer.classList.remove('show');
+        setTimeout(() => {
+            disclaimer.style.display = 'none';
+            
+            // Запускаем игру
+            closeMenu();
+        }, 500);
+    };
+}
+
+const DIALOGS = {
+  ep1: [
+    {"speaker":"Morpheus", "portrait": "assets/img/Morpheus.png", "textColor":"#00FF41", "text":"Wake up, Neo. The Matrix has you"},
+    {"speaker":"Morpheus", "portrait": "assets/img/Morpheus.png", "textColor":"#00FF41", "text":"Follow the white rabbit"},
+    {"speaker":"matrix","text":"Что? это шутка?"},
+    {"speaker":"matrix","text":"Я же просто шел в честный офис..."},
+    {"speaker":"matrix","text":"Утром я совсем разбитый. Пойду поищу молоко, такое же свежее, как наш председатель совета директоров каждую пятницу"},
+    {"speaker":"matrix","text":"А может лучше кофе? фильтр? да, фильтр определенно лучше! Но, к сожалению, я ещё не договорился с АХО и Скуратовым о поставке нам свежесваренного фильтра."},
+    {"speaker":"matrix","text":"Нужно поставить себе напоминалку в календарь!"},
+    {"speaker":"matrix","text":"Или может лучше сразу задачу в jira? а miro ещё работает? ох уж эти санкции... не дают работать православным котам"},
+    {"speaker":"matrix","text":"Осмотрюсь тут немного и пойду-ка я в сторону кухни на 4-й этаж, наша кофетачка всё равно не работает :("},
+    {"speaker":"matrix","text":"Может завтракающего запеканкой Бориса встречу, а может и с новенькой коллегой помурлыкаю.."}
+  ],
+ ep2: [
+  /* 0 */ {"speaker":"matrix","text":"о, Любовь, категорически приветствую, мур!"},
+  
+  /* 1 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"приветик :)"},
+  
+  /* 2 */ {"speaker":"matrix","text":"можно спросить? а есть ли у нас в компании профсоюз?"},
+  
+  /* 3 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"хаха, а зачем тебе профсоюз, Матрикс? Заходи, поговорим!"},
+  
+  /* 4 */ {"speaker":"matrix","text":"ну как зачем.. отстаивать права трудящихся... вести переговоры с работодателем.."},
+  
+  /* 5 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"а что, разве сейчас чьи-то права нарушаются?"},
+  
+  /* 6 */ {"speaker":"matrix","text":"да нет, просто, на всякий случай.. общественная, ну или в данном случае трудовая самоорганизация, так сказать.."},
+  
+  /* 7 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"а, поняла! Вы хотите предложить какие-то идеи"},
+  
+  /* 8 */ {"speaker":"matrix","text":"мяу! да! Это вроде инициативной группы. Может быть знаешь, как построили парк Горка?"},
+  
+  /* 9 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"Парк Горького?"},
+  
+  /* 10 */ {"speaker":"matrix","text":"нет, парк 'Горка'! Его построили силами инициативной группы жителей на месте стихийной парковки, а раньше там была больница, а еще раньше школа... привлекли местных депутатов, выбили бюджет... вот, яркий пример общественного самоуправления"},
+  
+  /* 11 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"нет, Матрикс, я не слышала о таком парке! А где он находится?"},
+  
+  /* 12 */ {"speaker":"matrix","text":"да прямо напротив хоральной синагоги! Михаил Турецкий именно там основал свой хор!"},
+  
+  /* 13 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"ого.."},
+  
+  /* 14 */ {"speaker":"matrix","text":"ну да, собрал маленьких мальчиков, научил их петь и с тех пор вот уже более 30 лет возит их по миру, почти как Моисей!"},
+  
+  /* 15 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"гм"},
+  
+  /* 16 */ {"speaker":"matrix","text":"а можно еще вопрос? когда будет грузинский корпоратив? коллеги интересуются.. я их, в общем-то, концептуально поддерживаю!"},
+  
+  /* 17 */ {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"понимаешь, Матрикс.. у нас бюджет закладывается в начале года.. но на следующий год мы точно все запланируем!"},
+
+/* 19 */
+{"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"..."},
+{"speaker":"chef", "portrait":"assets/img/chief_1.png", "text":"Матрикс, когда преза готова будет? где рассылка писем счастья негодяям? Иди, а я пока с Любой поговорю!"},  // ⬅️ Сразу к концу
+{"speaker":"matrix","text":"да я вообще за кофе пришел, на третьем этаже тачка сломалась!"},
+{"speaker":"chef", "portrait":"assets/img/chief_1.png", "text":"бездельник..."},
+{"speaker":"matrix","text":"Ладно, пойду. Хорошего дня!"},
+{"speaker":"matrix","text":"А как выйти из кабинета? замок у вас такой интересный.. ретро.."},
+{"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"а зря вы дверь захлопнули, теперь нужно комбинацию цифр ввести!"},
+{"speaker":"matrix","text":"да? а какой пароль?"},
+{"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"Матрикс, ты ведь стоишь в очереди на должность бадди! В запасе, так сказать.."},
+{"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"А все кандидаты на роль бадди проходят тестирование, в том числе на знание ключевых ценностей и сокральных чисел!"},
+{"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"У нас ведь <u>Ч</u>естный <u>З</u>нак! Так что, точно догадаешься. Тем более ты у нас аналитиком работаешь!"},
+{"type":"doorLock", "code":["0","4","3"]},
+
+
+],
+
+
+
+ ep3: [
+  /* 0 */ {"speaker":"matrix","text":"мрр.. я на кухне! удивительно, но сегодня многолюдно, хоть и утро на дворе!"},
+  /* 1 */ {"speaker":"matrix","text":"Надо бы бахнуть кофейку.. с маркированным молочком!"},
+  {"type":"coffeeGame"},
+  {"speaker":"matrix","text":"Ммм, кофеек! Теперь можно и поработать!"},
+  /* 2 */ {"speaker":"matrix","text":"таки Борю не видно. Не приехал, на полянке остался.. могу его понять, погода сейчас совсем не офисная.."},
+  /* 3 */ {"speaker":"matrix","text":"все-таки сколько здесь разных банок склянок.. как хозяюшки за всем успевают, не понимаю.."},
+  /* 4 */ {"speaker":"matrix","text":"наверняка у них еще много важной работы, которую мы не замечаем!"},
+  /* 5 */ {"speaker":"matrix","text":"вот мух стало меньше? вроде бы меньше! Большие стаканчики отвоевали? отвоевали! Альтернативное молоко разрешили? ну тут да.. пока не договорились"},
+  
+  /* 6 */ {
+    "speaker":"matrix",
+    "choices": [
+      {"text":"о, кешью!", "goto":7},
+      {"text":"Сколько здесь разных кубков и медалей….", "goto":11}
+    ]
+  },
+  
+  /* 7 - ВЕТКА 1 */
+  {"speaker":"matrix","text":"уходим, уходим, ухооодиим! (голосом Ильи Лагутенко) ха-ха"},
+  
+  /* 8 */
+  {"speaker":"matrix","text":"*и яблоко прихвачу, поедет ко мне домой*"},
+  
+  /* 9 */
+  {
+    "speaker":"matrix",
+    "text":"хех",
+    "choices": [{"text":"[продолжить]", "goto": 999}]
+  },
+  
+  /* 10 - пропуск */
+  null,
+  
+  /* 11 - ВЕТКА 2 */
+  {"speaker":"matrix","text":"я считаю правильно, здесь им самое место. Люди должны знать своих героев!"},
+  
+  /* 12 */
+  {
+    "speaker":"matrix",
+    "text":"хех",
+    "choices": [{"text":"[продолжить]", "goto": 999}]
+  }
+],
+
+
+
+ ep4: [
+  /* 0 */ {"speaker":"matrix","text":"А что это у вас? Бразильская герилья? Биография Роберта Оппенгеймера?"},
+
+  /* 1 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"это который создал атомную бомбу и во время испытаний на полегоне Тринити сказал «Я стал смертью, разрушителем миров»?"},
+  
+  /* 2 */ {"speaker":"matrix","text":"да, но он ведь создал бомбу, чтобы немцев остановить...."},
+  
+  /* 3 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"Да нет, Матрикс, это не про него. Кто-то оставил в офисе абсолютно новую книгу про жизнь и восхождение Стэна Ли! Низкий поклон этому человеку"},
+  
+  /* 4 */ {"speaker":"matrix","text":"Ого! это который мстителей придумал?"},
+  
+  /* 5 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"да! Обожаю железного человека!"},
+  
+  /* 6 */ {"speaker":"matrix","text":"ну да, он же гений, миллиардер, плэйбой, филантроп...."},
+    
+  /* 11 */ {"speaker":"matrix","text":"Возвращаясь к Роберту Оппенгеймеру, вы всет-таки читали?"},
+  
+  /* 12 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"нет, но я смотрел фильм!"},
+  
+  /* 13 */ {"speaker":"matrix","text":"понял, а я только 'барби' смотрел..вам не показалось, что фильм совсем не про..."},
+  
+  /* 14 */ {"speaker":"matrix","text":"ладно, у нас еще эти самые барби не отмаркированы, кажется..это нужно у Варвары уточнить! пойду фокусироваться на результат, а не на демагогию"},
+  
+  /* 15 */ {"speaker":"chief","portrait":"assets/img/chief_1.png","text":"Матрикс, ты еще здесь?"},
+  
+  /* 16 */ {"speaker":"matrix","text":"Так я ведь кофе выпить пришел, сейчас кофеин повысит рефлекторную возбудимость спинного мозга, сократит миокарду, я сразу в полтора раза эффективнее стану!"},
+  
+  /* 17 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"0_0...."},
+  
+  /* 18 */ {"speaker":"chief","portrait":"assets/img/chief_1.png","text":"давай давай, я щас догоню, подкину интересную задачку"},
+  
+  /* 19 */ {"speaker":"security","portrait":"assets/img/security_face.png","text":"хорошего дня, Матрикс!"}
+],
+
+ ep5: [
+  /* 0 */ {"speaker":"matrix","text":"*опять? да не может быть.... коллеги мне точно не поверят*"},
+  
+  /* 1 */ {"speaker":"matrix","text":"гкхм.. добрый день, Филипп Бедросович!"},
+  
+  /* 2 */ {"speaker":"bodyguard","portrait":"assets/img/king_filipp_bg.png","text":"*угрюмый взгляд*"},
+  
+  /* 3 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"Добрый день, Матрикс! ;)"},
+  
+  /* 4 */ {"speaker":"matrix","text":"а вы что тут делаете?"},
+  
+  /* 5 */ {"speaker":"bodyguard","portrait":"assets/img/king_filipp_bg.png","text":"кхе-кхе... -_-"},
+  
+  /* 6 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"да я, Матрикс, не в тот лифт зашел!"},
+  
+  /* 7 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"я вообще к Яне приехал"},
+  
+  /* 8 */ {"speaker":"matrix","text":"ну я так и подумал. Это вам лучше было с улицы зайти.."},
+  
+  /* 9 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"да я уже понял.. сначала ждал этот лифт несколько минут, потом он еще и проехал мимо моего этажа... кошмар .."},
+  
+  /* 10 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"вот попали с Леонидом в честный знак какой-то"},
+  
+  /* 11 */ {"speaker":"matrix","text":";)"},
+  
+  /* 12 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"Лёня, ты слышал что-нибудь про этот честный знак?"},
+  
+  /* 13 */ {"speaker":"bodyguard","portrait":"assets/img/king_filipp_bg.png","text":"ну, гхм, по телевизору видел рекламу.. молочку теперь можно проверять через телефон, у меня жена пользуется!"},
+  
+  /* 14 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"о, как здорово придумали для народа"},
+  
+  /* 15 */ {"speaker":"matrix","text":"да нормально, в общем-то. Удобно срок годности проверять, намного быстрее, чем на этикетке с лупой искать"},
+  
+  /* 16 */ {"speaker":"matrix","text":"ну ладно, мне пора бежать, мяу!"},
+  
+  /* 17 */ {"speaker":"kirkorov","portrait":"assets/img/king_filipp_face.png","text":"чао-какао, Матрикс!"},
+  
+  /* 18 */ {"speaker":"matrix","text":"ага, Яне - привет! Да и Алле, если встретитесь!"}
+],
+
+  ep6: [
+  /* 0 */ {"speaker":"matrix","text":"опа! какие люди в нашем опенспейсе!"},
+  
+  /* 1 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"о, Матрикс! я тоже рад тебя видеть!"},
+  
+  /* 2 */ {"speaker":"matrix","text":"Вилли, а ты чего это в офисе? Соскучился?"},
+  
+  /* 3 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"я сегодня буду новый регистратор выбытия тестировать! Он подключается прямо к спутникам Starlink Илона Маска! Слышал про такие?"},
+  
+  /* 4 */ {"speaker":"matrix","text":"конечно! А ты, кстати, знаешь что значит его фамилия? это очень просто!"},
+  
+  /* 5 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"хмм.. что?"},
+  
+  /* 6 */ {"speaker":"tikhonova","portrait":"assets/img/tikhonova_face.png","text":"мускус!"},
+  
+  /* 7 */ {"speaker":"matrix","text":"да! Александра Викторовна, а ты откуда знаешь?"},
+  
+  /* 8 */ {"speaker":"tikhonova","portrait":"assets/img/tikhonova_face.png","text":"у меня подружка английский язык преподает!"},
+  
+  /* 9 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"а я вообще IELTS сдал с первого раза!"},
+  
+  /* 10 */ {"speaker":"matrix","text":"*madre mia*"},
+  
+  /* 11 */ {"speaker":"matrix","text":"класс, а я скотный двор в оригинале читал. Тяжеловато было, там много слов не самых часто употребляемых в современной речи"},
+  
+  /* 12 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"Матрикс, я не понял, ты чего, уже весь <u>BABOK</u> вызубрил?"},
+  
+  /* 13 */ {"speaker":"matrix","text":"бабок?"},
+  
+  /* 14 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"Business Analysis Body of Knowledge, не слышал о таком?"},
+  
+  /* 15 */ {"speaker":"matrix","text":"...."},
+  
+  /* 16 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"это же настольная книга бизнес-аналитика!"},
+  
+  /* 17 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"У Сталина настольной книгой был труд итальянского мыслителя эпохи возраждения, она же Ренессанс, Никколло Макиавелли 'Государь'"},
+  
+  /* 18 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"а у тебя должен быть BABOK!"},
+  
+  /* 19 */ {"speaker":"tikhonova","portrait":"assets/img/tikhonova_face.png","text":"........."},
+  
+  /* 20 */ {"speaker":"matrix","text":"ну так и чего с твоими РВ? просрочку то хоть не позволяют выводить из оборота?"},
+  
+  /* 21 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"лабораторные эксперименты не совсем репрезентативны, нужны полевые исследования"},
+  
+  /* 22 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"вот мы, кстати, с Александрой Викторовной скоро как раз поедем на присоединенные поля, РВ устанавливать, аптеки и мед. организации обучать!"},
+  
+  /* 23 */ {"speaker":"tikhonova","portrait":"assets/img/tikhonova_face.png","text":"Матркис, это правда! Я себе уже модный бронежилет заказала!"},
+  
+  /* 24 */ {"speaker":"matrix","text":"а я думал на время командировки корпоративный выдают..."},
+  
+  /* 25 */ {"speaker":"chief","portrait":"assets/img/chief_1.png","text":"ага, и телохранителя с водителем! Давайте, работайте!"},
+  
+  /* 26 */ {"speaker":"matrix","text":"*да я ведь <u>КОТ</u>, у меня ведь <u>ЛАПКИ</u>*"},
+  
+  /* 27 */ {"speaker":"matrix","text":"*еще и музыка эта в пляс тянет*"},
+  
+  /* 28 */ {"speaker":"matrix","text":"*пойду-ка я к себе, пока моего самурая не угнали*"}
+],
+
+  ep7: [
+  /* 0 */ {"speaker":"matrix","text":"эмм.. The Weeknd??"},
+  
+  /* 1 */ {"speaker":"tamerlan","portrait":"assets/img/weeknd_face.png","text":"Привет, не, я Тамерлан!"},
+  
+  /* 2 */ {"speaker":"matrix","text":"ха-ха, извини, очень похожи!!"},
+  
+  /* 3 */ {"speaker":"tamerlan","portrait":"assets/img/weeknd_face.png","text":"хахахх"},
+    
+  /* 5 */ {"speaker":"kosarev","portrait":"assets/img/kosarev.png","text":"привет, коллеги! А что я здесь делаю?"},
+  
+  /* 6 */ {"speaker":"kosarev","portrait":"assets/img/kosarev.png","text":"я ведь не хотел здесь быть"},
+  
+  /* 7 */ {"speaker":"matrix","text":"Алексей Анатолич, я ведь обещал тебе камео."},
+    
+  /* 9 */ {"speaker":"kosarev","portrait":"assets/img/kosarev.png","text":"а я потом передумал! и воообще я не в фарме даже.."},
+    
+  /* 11 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"категорически приветствую, коллеги!"},
+  
+  /* 12 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"пока шел по опенспейсу, слышал что-то про викенда говорили. А мне вот группа O-Zone нравится!"},
+
+ /* 13 */  {"speaker":"matrix","text":"*Ma-ia-hii, ma-ia-huu Ma-ia-hoo, ma-ia-haa*"},
+  
+  /* 14 */ {"speaker":"matrix","text":"о, Борис, а я думал ты не придешь сегодня в офис.."},
+  
+  /* 15 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"так я ведь в Сити на встречу с Минпромторгом ездил"},
+  
+  /* 16 */ {"speaker":"matrix","text":"субстанцию обсуждали?"},
+  
+  /* 17 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"Да, её самую! Только не новый фильм с Деми Мур, а основной действующий компонент лекарственного средства, который обеспечивает его лечебный, профилактический или диагностический эффект"},
+
+            {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":" Это вещество (синтетического, растительного или животного происхождения) используется как сырье для производства готовых лекарственных форм (таблеток, растворов, мазей)..."},
+  
+            {"speaker":"matrix","text":"да ты уже говорил, Борис Михалыч...."},
+
+ /* 18 */ {"speaker":"matrix","text":"ну понятно, долго же вы сидели там!"},
+  
+  /* 19 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"Матрикс, ты не поверишь, ко мне ведь на парковке местные крипто-цыганки приставали! Их у сити больше, чем голубей на площади Сан-Марко в Венеции!"},
+  
+  /* 20 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"позолоти да позолоти нам ручку, переведи биток на криптокошелек, у меня и кукуха-код имеется на бумажке, говорит!"},
+  
+  /* 22 */ {"speaker":"matrix","text":"ну а ты чего? перевел?"},
+  
+  /* 23 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"да я еле оторвался от них.. Они на Крис переключились! И вообще я все в догкоинах храню! биткоины чьи? Сатоши какой-то, черт его знает.. а догкоин Илон Маск придумал, он то не кинет, у него репутация!"},
+  
+  /* 24 */ {"speaker":"kris","portrait":"assets/img/Kris.png","text":"охх, всем привет...."},
+  
+  /* 25 */ {"speaker":"matrix","text":"Крис, ты как от цыганок отвязалась?"},
+  
+  /* 26 */ {"speaker":"kris","portrait":"assets/img/Kris.png","text":"ну у меня биткоинов этих не было, нашла в сумке шоколадную медальку, с детского утренника осталась.."},
+  
+  /* 27 */ {"speaker":"kris","portrait":"assets/img/Kris.png","text":"ну я и отдала им, сказала, что это TON Павла Дурова. Его то все знают, вот и поверили!"},
+  
+  /* 28 */ {"speaker":"matrix","text":"<u>FREE DUROV</u>"},
+  
+  /* 30 */ {"speaker":"kosarev","portrait":"assets/img/kosarev.png","text":"коллеги, давайте без провокаций"},
+  
+  /* 31 */ {"speaker":"kosarev","portrait":"assets/img/kosarev.png","text":"идите в курилку саботировать!"}
+],
+
+  ep8: [
+  /* 0 */ {"speaker":"matrix","text":"показалось?"},
+  
+  /* 1 */ {"speaker":"matrix","text":"ребята, вы видели?"},
+  
+  /* 2 */ {"speaker":"kris","portrait":"assets/img/Kris.png","text":"..........?"},
+  
+  /* 3 */ {"speaker":"matrix","text":"Бегемот? ты чего тут делаешь?"},
+  
+  /* 4 */ {"speaker":"begemot","portrait":"assets/img/cat_begemot_face.png","text":"ПрРивет, да мы тут.. это.. мимо проходили...муРР"},
+  
+  /* 5 */ {"speaker":"matrix","text":"что-то я тебе не верю"},
+  
+  /* 6 */ {"speaker":"begemot","portrait":"assets/img/cat_begemot_face.png","text":"ладно, раскусил! У нас сегодня вечером шоу в театре Сатиры!"},
+  
+  /* 7 */ {"speaker":"kris","portrait":"assets/img/Kris.png","text":"о, коллеги, а мы ведь давно собирались куда-нибудь выбраться на тимбилдинг, так сказать"},
+  
+  /* 8 */ {"speaker":"sasha","portrait":"assets/img/tikhonova_face.png","text":"давайте, я ЗА!"},
+  
+  /* 9 */ {"speaker":"matrix","text":"колле..."},
+  
+  /* 10 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"и мне нравится это предложение!"},
+  
+  /* 11 */ {"speaker":"matrix","text":"но.."},
+  
+  /* 12 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"а что будет-то там, на этом вашем шоу? шахматный турнир? так я там всех переиграю, я ведь чемпион ЦРПТ!"},
+  
+  /* 13 */ {"speaker":"begemot","portrait":"assets/img/cat_begemot_face.png","text":"Будет шоу для московской публики! Сеанс черной магии и переодевания в салоне парижских мод!"},
+  
+  /* 14 */ {"speaker":"willi","portrait":"assets/img/willi_face.png","text":"черная магия.. звучит интересно!"},
+  
+  /* 15 */ {"speaker":"kushch","portrait":"assets/img/Kushch_face.png","text":"а переодеваться обязательно? <u>меня и мой молдавский костюмчик устраивает</u>..."},
+  
+  /* 16 */ {"speaker":"matrix","text":"*не нравится мне все это, не к добру..*"},
+  
+  /* 17 */ {"speaker":"begemot","portrait":"assets/img/cat_begemot_face.png","text":"ну, значитс еще увидимся, МЯУ!"}
+],
+
+};
+const EPISODE_BACKGROUNDS = {
+  ep1: 'assets/img/hall_back3.png',
+  ep2: 'assets/img/lyuba_pic3.png',
+  ep3: 'assets/img/kitchen.png',
+  ep4: 'assets/img/security.png',
+  ep5: 'assets/img/king_filipp.png',
+  ep6: 'assets/img/willi_back2.png',
+  ep7: 'assets/img/os_back.png',
+  ep8: 'assets/img/smoking.png'
+};
+
+const EPISODE_MUSIC = {
+  ep1: 'assets/audio/music_ep1.mp3',
+  ep2: 'assets/audio/music_ep2.mp3',
+  ep3: 'assets/audio/music_ep3.mp3',
+  ep4: 'assets/audio/music_ep4.mp3',
+  ep5: 'assets/audio/music_ep5.mp3',
+  ep6: 'assets/audio/music_ep6.mp3',
+  ep7: 'assets/audio/music_ep7.mp3',
+  ep8: 'assets/audio/music_ep8.mp3'
+};
+
+const CONFIG = {
+  scoring: { common: 2, rare: 5, epic: 10, legendary: 50 },
+  inventory: { cols: 5, rows: 4 },
+  persona: {
+    selected: localStorage.getItem('persona') || 'classic',
+    options: {
+      classic: { name:'Классический', portrait:'assets/img/portraits/matrix_classic.png', sfx:'assets/audio/perfect.mp3', desc:'Классический Матрикс, он и в африке Матрикс.' },
+      vampire: { name:'Вампир', portrait:'assets/img/portraits/matrix_vampire.png', sfx:'assets/audio/sfx_persona_vampire.mp3', desc:'Белла, это кожа убийцы' },
+      lovelas: { name:'Лавилас', portrait:'assets/img/portraits/matrix_lovelas.png', sfx:'assets/audio/sfx_persona_lovelas.mp3', desc:'Посмотрите на меня, теперь на своего кота, снова на меня. Да, я на коне!' }
+    }
+  },
+  episode: { id: 'ep1', title: 'Эпизод 1. Холл', bg: 'assets/img/hall_back3.png', music: 'assets/audio/music_ep1.mp3' },
+  episodesList: [
+    { id:'ep1', title:'Эпизод 1', unlocked:true },
+    { id:'ep2', title:'Эпизод 2', unlocked:false },
+    { id:'ep3', title:'Эпизод 3', unlocked:false },
+    { id:'ep4', title:'Эпизод 4', unlocked:false },
+    { id:'ep5', title:'Эпизод 5', unlocked:false },
+    { id:'ep6', title:'Эпизод 6', unlocked:false },
+    { id:'ep7', title:'Эпизод 7', unlocked:false },
+    { id:'ep8', title:'Эпизод 8', unlocked:false },
+  ],
+  objects: [
+ 
+    { id:'obj_andre', img:'assets/img/obj_andre.png', model3d: 'assets/models/andre_model-v1.glb', x: 405, y: 721, rarity:'rare', secret:false, episode: 'ep1', scale: 0.22,  // ⬅️ 0.5 = 50% размера, 0.3 = 30%, 1.0 = 100%
+    title:'Andre the giant has a posse', desc:'Изображение Andre the Giant Has a Posse — это стрит-арт кампания, созданная художником Шепардом Фейри в 1989 году, когда он учился в Школе дизайна Род-Айленда. На стикере изображён французский рестлер Андре Гигант',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_andre.mp3' } },
+
+    { id:'cosmo', img:'assets/img/cosmo.png', model3d: 'assets/models/cosmo_model-v4.glb', x: 1053, y: 535, rarity:'common', secret:false, episode: 'ep1', scale: 0.1, 
+    title:'Фигурка космонавта', desc:'Интересно, кто-нибудь кроме меня задумывался, почему космонавты?',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_nya.mp3' } },
+
+     { id:'logo_pg', img:'assets/img/obj_pg_logo.png', x: 1400, y: 140, rarity:'legendary', secret:false, episode: 'ep2', scale: 0.4, 
+    title:'Логотип PG', desc:'хмм.. похоже на логотип одной ЧВК.... что он здесь делает? неужели марш справедливости дошел и до офиса на трехгорной мануфактуре?',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_lookatyou.mp3' } },
+
+     { id:'crocs', img:'assets/img/crocs.png', model3d: 'assets/models/crocs_model-v1.glb', x: 164, y: 780, rarity:'common', secret:false, episode: 'ep2', scale: 0.8, 
+    title:'Кроксы', desc:'наверное готовят новый мерч для сотрудников.    О корпаративных кроксах я давно мечтаю)',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_gold_digger.mp3' } },
+
+    { id:'obj_apple', img:'assets/img/obj_apple.png', model3d: 'assets/models/apple_model-v1.glb', x: 500, y: 480, rarity:'common', secret:false, episode: 'ep3', scale: 0.3, 
+    title:'Яблоко', desc:'еще не БАД, но уже хорошо. Поедет ко мне домой!',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_ukus.mp3' } },
+
+     { id:'medal', img:'assets/img/medal.png', model3d: 'assets/models/medal_model-v1.glb', x: 1400, y: 290, rarity:'legendary', secret:false, episode: 'ep3', scale: 0.25, 
+    title:'Золотая медаль', desc:'Борису Михалычу, за победу при трехгорке 25.12.2025',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_ctmn.mp3' } },
+
+    { id:'BAD', img:'assets/img/pills.png', model3d: 'assets/models/pills_model-v1.glb', x: 650, y: 800, rarity:'common', secret:false, episode: 'ep3', scale: 0.3, 
+    title:'БАДы', desc:'какие-то пилюли, похожи на БАД.. А как точно понять? Вроде бы если есть регистрационное удостоверение, значит лекарство, а если свидетельство о государственной регистрации - БАДы',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_swallow.mp3' } },
+
+    { id:'babok', img:'assets/img/babok.png', x: 1200, y: 900, rarity:'rare', secret:false, episode: 'ep4', scale: 1, 
+    title:'BABOK', desc:'Руководство к Своду знаний по бизнес-анализу. На озоне за него просят 12 тысяч, лучше бесплатно загуглю как мне BPMN-схемки рисовать',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_babok.mp3' } },
+
+    { id:'maga', img:'assets/img/maga.png', x: 1400, y: 350, rarity:'epic', secret:false, episode: 'ep4', scale: 0.7, 
+    title:'MAGA', desc:'MAGA movement, nativist political movement that emerged in the United States during the 2016 presidential campaign of its putative leader, Donald Trump. Its name is derived from Trump’s 2016 campaign slogan “Make America Great Again,” which has been a rallying cry for many Trump supporters ever since.',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_fake_news.mp3' } },
+
+     { id:'cap', img:'assets/img/fill_shapka.png', model3d: 'assets/models/fill_cap_model-v1.glb', x: 770, y: 300, rarity:'epic', secret:false, episode: 'ep5', scale: 1.8, 
+    title:'Эстрадный плюмаж', desc:'какая-то карнавальная шапка с перьями, судя по всему, король эстрады только что забрал ее у швеи, которая с нами по соседству делит этаж',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_pink_wig.mp3' } },
+
+    { id:'telephone', img:'assets/img/telephone2.png', model3d: 'assets/models/telephone_model-v1.glb', x: 400, y: 800, rarity:'common', secret:false, episode: 'ep6', scale: 0.7, 
+    title:'Сотовый телефон', desc:'четкая мобила, прямиком из молодости Вилли',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_skype.mp3' } },
+
+    { id:'Контроцептив', img:'assets/img/preservation2.png', model3d: 'assets/models/condom_model-v1.glb', x: 150, y: 135, rarity:'SEXY', secret:false, episode: 'ep6', scale: 0.2, 
+    title:'Презерватив для исследований', desc:'Медицинское изделие. Обязательность маркировки еще не наступила, возможно, это Петр Алексеевич приносил заценить.', visible: false, zIndex: 20,  
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_losing.mp3' } },  
+
+    { id:'Ветики', img:'assets/img/vet_pills.png', model3d: 'assets/models/vet_pills_model-v1.glb', x: 400, y: 440, rarity:'common', secret:false, episode: 'ep6', scale: 0.5, 
+    title:'Ветеринарный препарат', desc:'Собачки тоже иногда болеют. Хорошо, что Вилли #невсеравно и он заботится о них', 
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_dog.mp3' } },
+
+    { id:'Note', img:'assets/img/note.png', model3d: 'assets/models/note.glb', x: 1300, y: 570, rarity:'common', secret:false, episode: 'ep6', scale: 0.4, 
+    title:'Стикер', desc:'моя прелесть, моя гордость - Постановление Правительства РФ от 27.05.2024 г. № <u>675</u>', 
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_forreal.mp3' } },
+
+    { id:'ЭТАНОЛ', img:'assets/img/ethanol.png', model3d: 'assets/models/ethanol_model-v1.glb', x: 630, y: 520, rarity:'rare', secret:false, episode: 'ep7', scale: 0.07, 
+    title:'Бутыль содержащая некую субстанцию', desc:'должно быть согревает!',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_goodkush.mp3' } },
+
+    { id:'Matrix', img:'assets/img/matrix_toy.png', model3d: 'assets/models/matrix_toy_model-v1.glb', x: 1200, y: 570, rarity:'epic', secret:false, episode: 'ep7', scale: 0.1, 
+    title:'SuperMatrix', desc:'чей-то коллекционный кот маскот. Вдохновляет и мотивирует на результат.',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_wu_tang.mp3' } },
+
+    { id:'obj_cigarette', img:'assets/img/obj_cigarette.png', model3d: 'assets/models/marlboro_model-v1.glb', x: 900, y: 770, rarity:'common', secret:false, episode: 'ep8', scale: 0.22,  // ⬅️ 0.5 = 50% размера, 0.3 = 30%, 1.0 = 100%
+    title:'Пачка Marlboro', desc:'если есть в кармане пачка сигарет.... Вот только она не маркирована, похоже, табачники поделились контрафактом...',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_smoke.mp3' } },
+
+    { id:'DOBERMAN', img:'assets/img/doberman.png', model3d: 'assets/models/doberman_model-v1.glb', x: 500, y: 80, rarity:'epic', secret:false, episode: 'ep8', scale: 0.22,  // ⬅️ 0.5 = 50% размера, 0.3 = 30%, 1.0 = 100%
+    title:'ДОБЕРМАН', desc:'да что здесь вообще происходит? откуда он там взялся?',
+    sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_dmx.mp3' } },
+
+   // Сейф (закрытый по умолчанию)
+    { 
+      id: 'safe', 
+      img: 'assets/img/vault_close2.png',  // ⚠️ Путь к твоему изображению
+      x: 150, 
+      y: 170, 
+      rarity: 'epic', 
+      secret: false, 
+      episode: 'ep6', 
+      scale: 0.7,
+      title: 'Кодовый сейф', 
+      desc: 'Старый сейф с кодовым замком. Интересно, что внутри?',
+      zIndex: 10,  
+      interactive: true, // ⚠️ Важно! Делает объект интерактивным
+      action: function() {
+        if (state.safeCracked) {
+          showMessage('Сейф уже открыт.');
+        } else {
+          openSafeCrackGame();
+        }
+      },
+      sfx: { 
+        
+        take: 'assets/audio/sfx_pink_wig.mp3' 
+      } 
+    },
+
+
+
+  ], // ⬅️ Закрывающая скобка массива objects
+
+  dialogue: DIALOGS.ep1
+};
+
+const state = {
+  nickname: localStorage.getItem('nickname') || '',
+  score: Number(localStorage.getItem('score')||0),
+  taken: JSON.parse(localStorage.getItem('taken')||'[]'),
+  dialogueIndex: Number(localStorage.getItem('dlgIdx')||0),
+  editor: false,
+    disclaimerShown: false,
+  persona: localStorage.getItem('persona') || CONFIG.persona.selected,
+};
+const $ = sel => document.querySelector(sel);
+function save(){localStorage.setItem('nickname', state.nickname);localStorage.setItem('score', String(state.score));localStorage.setItem('taken', JSON.stringify(state.taken));localStorage.setItem('dlgIdx', String(state.dialogueIndex)); disclaimerShown: state.disclaimerShown,localStorage.setItem('persona', state.persona);}
+function validNick(n){ return /^[A-Za-z0-9_]{3,16}$/.test(n); }
+function playSfx(src){ if(!src) return; const a=new Audio(src); a.volume=0.9; a.play().catch(()=>{}); }
+const music = new Audio(); music.loop = true; music.volume = 0.6;
+function playEpisodeMusic(src){ if(!src) return; music.src = src; music.play().catch(()=>{}); }
+function playMenuMusic(){music.src = 'assets/audio/main_theme2.mp3';music.loop = true;music.volume = 0.6;music.play().catch(()=>{});}
+const bg = $('#bg');
+function loadScene(){ bg.style.backgroundImage = `url(${CONFIG.episode.bg})`; }
+const invGrid = $('#invGrid');
+function buildInventory() {
+  invGrid.innerHTML = '';
+  
+  const cells = CONFIG.inventory.cols * CONFIG.inventory.rows;
+  for(let i = 0; i < cells; i++) { 
+    const c = document.createElement('div'); 
+    c.className = 'cell'; 
+    invGrid.appendChild(c); 
+  }
+  
+  const imgs = CONFIG.objects.filter(o => state.taken.includes(o.id));
+  imgs.forEach((o, idx) => {
+    const cell = invGrid.children[idx]; 
+    if(!cell) return;
+    
+    const im = document.createElement('img'); 
+    im.src = o.img; 
+    im.alt = o.title; 
+    im.title = o.title + ' (клик для просмотра 3D)';
+    
+    // ⬇️ ДОБАВЛЯЕМ КЛИК ДЛЯ ОТКРЫТИЯ 3D
+    cell.style.cursor = 'pointer';
+    cell.style.transition = 'transform 0.2s, box-shadow 0.2s';
+    
+    cell.onmouseenter = () => {
+      cell.style.transform = 'scale(1.05)';
+      cell.style.boxShadow = '0 0 15px rgba(255, 217, 59, 0.4)';
+    };
+    
+    cell.onmouseleave = () => {
+      cell.style.transform = 'scale(1)';
+      cell.style.boxShadow = 'none';
+    };
+    
+    cell.onclick = () => {
+      playSfx('assets/audio/sfx_security.mp3');  // Звук клика
+      open3DViewer(o);
+    };
+    
+    cell.appendChild(im);
+  });
+   updateInventoryPoints();
+}
+
+let ctxEl = null;
+
+let isRendering = false;
+let renderCount = 0;
+
+// Глобальные переменные для фиксированных размеров
+let CACHED_SCENE_WIDTH = null;
+let CACHED_SCENE_HEIGHT = null;
+
+function updateInventoryPoints() {
+  const pointsElement = document.getElementById('inventoryPoints');
+  
+  if (!pointsElement) return;
+  
+  // Обновляем отображение текущего счёта
+  pointsElement.textContent = `${state.score} pts`;
+  
+  console.log('💰 Всего очков:', state.score);
+    saveResultToFirebase();
+}
+
+
+function cacheSceneDimensions() {
+    CACHED_SCENE_WIDTH = window.innerWidth;
+    CACHED_SCENE_HEIGHT = window.innerHeight;
+    console.log(`📐 CACHED scene dimensions: ${CACHED_SCENE_WIDTH} x ${CACHED_SCENE_HEIGHT}`);
+}
+
+function renderObjects() {
+    renderCount++;
+    console.log(`🎬 ========== RENDER #${renderCount} START ==========`);
+    
+    if (isRendering) {
+        console.warn('⚠️ BLOCKED: Already rendering!');
+        return;
+    }
+    
+    isRendering = true;
+    
+    requestAnimationFrame(() => {
+        const currentEpisode = CONFIG.episode.id;
+        const episodeObjects = CONFIG.objects.filter(o => 
+            o.episode === currentEpisode || !o.episode
+        );
+        
+        const BASE_WIDTH = 1536;
+        const BASE_HEIGHT = 1024;
+        
+        // ✅ ИСПОЛЬЗУЕМ КЭШИРОВАННЫЕ размеры (зафиксированные при загрузке)
+        const sceneWidth = CACHED_SCENE_WIDTH || window.innerWidth;
+        const sceneHeight = CACHED_SCENE_HEIGHT || window.innerHeight;
+        
+        console.log(`📐 Using cached: ${sceneWidth} x ${sceneHeight}`);
+        console.log(`🪟 Current window: ${window.innerWidth} x ${window.innerHeight}`);
+        
+        const scaleX = sceneWidth / BASE_WIDTH;
+        const scaleY = sceneHeight / BASE_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const actualWidth = BASE_WIDTH * scale;
+        const actualHeight = BASE_HEIGHT * scale;
+        
+        const offsetX = (sceneWidth - actualWidth) / 2;
+        const offsetY = (sceneHeight - actualHeight) / 2;
+        
+        console.log(`⚙️ Scale: ${scale.toFixed(3)}, Offset: (${offsetX.toFixed(0)}, ${offsetY.toFixed(0)})`);
+        
+        // Удаляем старые предметы
+        scene.querySelectorAll('.obj').forEach(n => n.remove());
+        
+    episodeObjects.forEach(o => {
+    if (state.taken.includes(o.id)) {
+        console.log(`⏭️ Skip: ${o.id} (already taken)`);
+        return;
+    }
+    // ✅ Новый фильтр видимости
+    if (o.visible === false) {
+        console.log(`🙈 Hidden: ${o.id} (visible === false)`);
+        return;
+    }
+
+    const itemX = offsetX + (o.x * scale);
+    const itemY = offsetY + (o.y * scale);
+    
+    console.log(`📍 ${o.id}: base (${o.x}, ${o.y}) → screen (${itemX.toFixed(1)}, ${itemY.toFixed(1)})`);
+    
+    const wrap = document.createElement('div');
+    wrap.className = 'obj';
+    wrap.dataset.itemId = o.id;
+    wrap.style.left = `${itemX}px`;
+    wrap.style.top = `${itemY}px`;
+    wrap.style.transform = `translate(-50%, -50%)`;
+
+    if (typeof o.zIndex !== 'undefined') {
+        wrap.style.zIndex = String(o.zIndex);
+    }
+    
+    const im = document.createElement('img');
+    im.src = o.img;
+    im.alt = o.title;
+    
+    if (o.scale) {
+        im.style.transform = `scale(${o.scale})`;
+        im.style.transformOrigin = 'center center';
+    }
+    
+    // ✅ ИЗМЕНЕНО: События НА ИЗОБРАЖЕНИИ, а не на контейнере
+    im.addEventListener('mousedown', (e) => {
+        playSfx(o.sfx?.click);
+        if (state.editor) startDrag(e, o, wrap);
+    });
+    
+   // ✅ НОВЫЙ КОД
+im.addEventListener('click', (e) => {
+    if (state.editor) return;
+    
+    // ✅ ПРОВЕРКА: Если у объекта есть action (для сейфа)
+    if (o.action && typeof o.action === 'function') {
+        console.log('🎮 Вызов action для:', o.id);
+        o.action(); // Откроет мини-игру для сейфа
+        return; // Не открываем контекстное меню
+    }
+    
+    // Обычное открытие контекстного меню
+    openContext(o, e.clientX, e.clientY);
+});
+
+    
+    wrap.appendChild(im);
+    scene.appendChild(wrap);
+});
+
+isRendering = false;
+console.log(`✅ ========== RENDER #${renderCount} END ==========`);
+    
+    }
+)}
+
+
+
+// ========== 3D VIEWER ==========
+
+let current3DScene = null;  // Для очистки сцены при закрытии
+
+function open3DViewer(obj) {
+  // Проверка наличия 3D-модели
+  if (!obj.model3d) {
+    alert('У этого предмета пока нет 3D-модели 😔');
+    return;
+  }
+  
+  // Создаём модальное окно
+  const viewer = document.createElement('div');
+  viewer.className = 'model-viewer open';
+  viewer.id = 'modelViewer';
+  viewer.innerHTML = `
+    <button class="model-close">✕ Закрыть</button>
+    <canvas id="modelCanvas" class="model-canvas"></canvas>
+    <div class="model-info">
+      <h2>${obj.title}</h2>
+      <p>${obj.desc}</p>
+      <p class="model-hint">🖱️ Зажми левую кнопку мыши для вращения | Колёсико для зума</p>
+    </div>
+  `;
+  
+  document.body.appendChild(viewer);
+  
+  // Закрытие по кнопке
+  viewer.querySelector('.model-close').onclick = () => close3DViewer();
+  
+  // Закрытие по клику на фон
+  viewer.onclick = (e) => {
+    if (e.target === viewer) close3DViewer();
+  };
+  
+  // Инициализация 3D
+  setTimeout(() => init3DModel(obj.model3d), 100);
+}
+
+function close3DViewer() {
+  const viewer = document.getElementById('modelViewer');
+  if (viewer) {
+    viewer.remove();
+  }
+  
+  // Очистка Three.js сцены
+  if (current3DScene) {
+    current3DScene.dispose();
+    current3DScene = null;
+  }
+}
+
+async function init3DModel(modelPath) {
+  const canvas = document.getElementById('modelCanvas');
+  if (!canvas) return;
+  
+  // Импортируем Three.js как ES-модули
+  const THREE = await import('three');
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+  const { MeshoptDecoder } = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/meshopt_decoder.module.js');
+  
+  console.log('✅ Three.js загружен');
+  
+  // Настройка сцены
+  const scene = new THREE.Scene();
+  
+  
+  // Камера
+  const camera = new THREE.PerspectiveCamera(
+    50,
+    canvas.offsetWidth / canvas.offsetHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(0, 1, 3);
+  
+  // Рендерер
+  const renderer = new THREE.WebGLRenderer({ 
+    canvas, 
+    antialias: true,
+    alpha: true 
+  });
+  renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  
+  console.log('✅ Рендерер создан');
+  
+  // Освещение
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  
+  const directionalLight1 = new THREE.DirectionalLight(0xffd93b, 0.8);
+  directionalLight1.position.set(5, 10, 7);
+  scene.add(directionalLight1);
+  
+  const directionalLight2 = new THREE.DirectionalLight(0x4a9eff, 0.3);
+  directionalLight2.position.set(-5, -5, -5);
+  scene.add(directionalLight2);
+  
+  console.log('✅ Освещение добавлено');
+  
+  // Загрузка модели
+  const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
+  console.log('🔄 Загрузка модели:', modelPath);
+  
+  loader.load(
+    modelPath,
+    (gltf) => {
+      console.log('✅ Модель загружена!', gltf);
+      const model = gltf.scene;
+      
+      // Центрирование
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      
+      // Масштабирование
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 2 / maxDim;
+      model.scale.setScalar(scale);
+      
+      scene.add(model);
+      console.log('✅ Модель добавлена на сцену');
+    },
+    (xhr) => {
+      const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+      console.log(`📥 Загрузка: ${percent}%`);
+    },
+    (error) => {
+      console.error('❌ Ошибка загрузки:', error);
+      alert('Не удалось загрузить 3D-модель');
+    }
+  );
+  
+  // Управление
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 2;
+  
+  console.log('✅ OrbitControls добавлены');
+  
+  // Анимация
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+  
+  console.log('✅ Рендеринг запущен');
+  
+  // Адаптивность
+  window.addEventListener('resize', () => {
+    camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  });
+  
+  // Сохраняем для очистки
+  current3DScene = { 
+    scene, 
+    renderer, 
+    controls, 
+    dispose: () => {
+      controls.dispose();
+      renderer.dispose();
+    }
+  };
+}
+
+
+
+function openContext(obj, x, y){
+    console.log('📋 Opening context for:', obj.id);
+  closeContext();
+  const d=document.createElement('div');
+  d.className='ctx';
+  
+  // ✅ ЦЕНТРИРУЕМ ОКНО
+  
+  d.style.transform='translate(-50%, -50%)';
+  
+  d.innerHTML=`<h3>${obj.title}</h3><p>${obj.desc}</p>
+    <div class="row"><button class="btn" data-act="leave">Оставить</button><button class="btn" data-act="take">Взять</button></div>`;
+  d.addEventListener('click', e=>{
+    const act = e.target?.dataset?.act;
+    if(!act) return;
+    if(act==='leave') {
+            console.log('👋 Leave clicked');
+            closeContext();
+        }
+    if(act==='take'){
+            console.log('🖱️ Take clicked for:', obj.id);
+            takeObject(obj);
+            // closeContext() вызывается внутри takeObject()
+        }
+    });
+  document.body.appendChild(d);
+  ctxEl=d;
+}
+function closeContext(){
+    console.log('🚪 closeContext called');
+    if (ctxEl) {
+        console.log('Removing context popup');
+        ctxEl.remove();
+        ctxEl = null;
+    } else {
+        console.log('Context already closed');
+    }
+}
+function takeObject(obj) {
+      console.log('🎯 ========== TAKING OBJECT ==========');
+    console.log('Object:', obj.id);
+    console.log('Taken before:', state.taken);
+
+    const pts = CONFIG.scoring[obj.rarity] || 0;
+    state.score += pts;
+    state.taken.push(obj.id);
+    console.log('Taken after:', state.taken);
+    showScorePop(pts);
+    showRarityBanner(obj.rarity);
+    playSfx(obj.sfx?.take);
+    
+    save();
+    buildInventory();
+
+    
+
+    console.log('🚪 Closing context...');
+    closeContext();
+    
+    // Небольшая задержка для корректного закрытия попапа
+    setTimeout(() => {
+        console.log('🔄 Rendering objects...');
+        renderObjects();
+    }, 50);
+    
+    maybeShowGoldDigger();
+     console.log('✅ ========== TAKE COMPLETE ==========');
+}
+function showScorePop(n){ const d=document.createElement('div'); d.className='score-pop'; d.textContent = `+${n}`; $('#app').appendChild(d); setTimeout(()=>d.remove(), 3000); }
+function showRarityBanner(rarity) {
+  const banners = {
+    common: { text: 'ОБЫЧНЫЙ', color: '#8b8b95', glow: 'rgba(139, 139, 149, 0.5)' },
+    rare: { text: 'РЕДКИЙ', color: '#4a9eff', glow: 'rgba(74, 158, 255, 0.6)' },
+    epic: { text: 'ЭПИЧЕСКИЙ', color: '#a335ee', glow: 'rgba(163, 53, 238, 0.6)' },
+    legendary: { text: 'ЛЕГЕНДАРНЫЙ!', color: '#ff8000', glow: 'rgba(255, 128, 0, 0.7)' },
+    SEXY: { text: 'SEXY', color: '#ff007f', glow: 'rgba(255, 0, 127, 0.7)' }
+  };
+  
+  const config = banners[rarity];
+  if (!config) return;
+  
+  const b = document.createElement('div');
+  b.className = 'rarity-banner';
+  b.textContent = config.text;
+  b.style.cssText = `
+    position: fixed;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: 900;
+    color: ${config.color};
+    text-shadow: 0 0 16px ${config.glow}, 0 0 28px ${config.glow};
+    letter-spacing: 3px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    animation: rarityFlash 1.5s ease-out forwards;
+  `;
+  
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 1500);
+}
+
+
+function maybeShowGoldDigger() {
+  const totalItems = CONFIG.objects.length;  // ✅ Все предметы из всех эпизодов
+  
+  // ✅ Показываем только когда собраны ВСЕ предметы
+  if (totalItems > 0 && state.taken.length >= totalItems) {
+    const b = document.createElement('div'); 
+    b.id='goldDiggerBanner'; 
+    b.textContent='GOLD DIGGER';
+    b.style.cssText = `
+      position: fixed;
+      left: 50%;
+      top: 25%;
+      transform: translate(-50%, -50%);
+      font-size: 56px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 0 16px #ffef99, 0 0 28px #e0b500;
+      letter-spacing: 3px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      animation: goldFlash 4.0s ease-out forwards;
+    `;
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 2000);
+  }
+}
+
+// Плавный переход между эпизодами
+function fadeOutAndLoadEpisode(nextId, idx) {
+  console.log('🎬 Начало перехода на', nextId);
+  
+  const overlay = document.getElementById('transitionOverlay');
+  
+  // ✅ ШАГ 1: Затемнение (fade-out)
+  overlay.classList.add('active');
+  
+  // ✅ ШАГ 2: Через 1 секунду (когда экран полностью чёрный) загружаем эпизод
+  setTimeout(() => {
+    console.log('🔄 Загрузка эпизода', nextId);
+    loadNextEpisode(nextId, idx);
+    
+    // ✅ ШАГ 3: Через 0.5 сек после загрузки убираем затемнение (fade-in)
+    setTimeout(() => {
+      console.log('✨ Показываем новый эпизод');
+      overlay.classList.remove('active');
+    }, 500);
+  }, 1000); // 1 секунда на fade-out
+}
+
+
+function getMatrixPortrait() {const p = CONFIG.persona.options[state.persona] || CONFIG.persona.options.classic;return p.portrait;}
+let currentTypeTimer = null; // ⬅️ Глобальная переменная
+
+
+function typeText(text, color) {
+  const dlgText = document.getElementById('dialogText');
+  
+  if(!dlgText) {
+    console.error('dialogText element not found!');
+    return;
+  }
+  
+  if (currentTypeTimer) {
+    clearInterval(currentTypeTimer);
+    currentTypeTimer = null;
+  }
+  
+  dlgText.innerHTML = '';
+  dlgText.style.display = 'block';
+  dlgText.style.visibility = 'visible';
+  
+  // ✅ Устанавливаем цвет текста
+  if (color) {
+    dlgText.style.color = color;
+  } else {
+    dlgText.style.color = 'var(--neon)';
+  }
+  
+  // ✅ Создаём временный div для парсинга HTML
+  const temp = document.createElement('div');
+  temp.innerHTML = text;
+  
+  // ✅ Получаем массив текстовых узлов и тегов
+  const nodes = Array.from(temp.childNodes);
+  
+  let currentIndex = 0;
+  let currentNodeIndex = 0;
+  
+  currentTypeTimer = setInterval(() => {
+    if (currentNodeIndex >= nodes.length) {
+      clearInterval(currentTypeTimer);
+      currentTypeTimer = null;
+      return;
+    }
+    
+    const node = nodes[currentNodeIndex];
+    
+    // Если это текстовый узел - печатаем посимвольно
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent;
+      if (currentIndex < text.length) {
+        dlgText.appendChild(document.createTextNode(text[currentIndex]));
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+        currentNodeIndex++;
+      }
+    } 
+    // Если это HTML-элемент - добавляем целиком и начинаем печатать его содержимое
+    else if (node.nodeType === Node.ELEMENT_NODE) {
+      const clonedNode = node.cloneNode(false); // Копируем тег без содержимого
+      dlgText.appendChild(clonedNode);
+      
+      const innerText = node.textContent;
+      let innerIndex = 0;
+      
+      const innerTimer = setInterval(() => {
+        if (innerIndex < innerText.length) {
+          clonedNode.textContent += innerText[innerIndex];
+          innerIndex++;
+        } else {
+          clearInterval(innerTimer);
+        }
+      }, 60);
+      
+      currentNodeIndex++;
+    }
+  }, 60);
+}
+// Конфигурация замка
+const DOOR_CODE = ['0', '4', '3']; // Код для открытия
+let pressedKeys = new Set(); // Зажатые кнопки
+
+// Открыть замок
+function showDoorLock() {
+  const lock = document.getElementById('doorLock');
+  lock.style.display = 'flex';
+  
+  pressedKeys.clear();
+  
+  // Обработчики для мыши
+  document.querySelectorAll('.lock-btn').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => handlePress(e.target.dataset.digit));
+    btn.addEventListener('mouseup', (e) => handleRelease(e.target.dataset.digit));
+    btn.addEventListener('mouseleave', (e) => handleRelease(e.target.dataset.digit));
+  });
+  
+  // Обработчики для клавиатуры
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+}
+
+// Закрыть замок
+function closeDoorLock() {
+  const lock = document.getElementById('doorLock');
+  lock.style.display = 'none';
+  
+  document.removeEventListener('keydown', handleKeyDown);
+  document.removeEventListener('keyup', handleKeyUp);
+}
+
+// Нажатие кнопки
+function handlePress(digit) {
+  pressedKeys.add(digit);
+  
+  // Визуальная активация
+  document.querySelectorAll(`.lock-btn[data-digit="${digit}"]`).forEach(btn => {
+    btn.classList.add('pressed');
+  });
+  
+  checkCode();
+}
+
+// Отпускание кнопки
+function handleRelease(digit) {
+  pressedKeys.delete(digit);
+  
+  // Убрать визуальную активацию
+  document.querySelectorAll(`.lock-btn[data-digit="${digit}"]`).forEach(btn => {
+    btn.classList.remove('pressed');
+  });
+}
+
+// Обработка клавиатуры
+function handleKeyDown(e) {
+  const digit = e.key;
+  if (/^[0-9]$/.test(digit) && !pressedKeys.has(digit)) {
+    handlePress(digit);
+  }
+}
+
+function handleKeyUp(e) {
+  const digit = e.key;
+  if (/^[0-9]$/.test(digit)) {
+    handleRelease(digit);
+  }
+}
+
+// Проверка кода
+function checkCode() {
+  const status = document.querySelector('.lock-status');
+  
+  const isCorrect = DOOR_CODE.every(digit => pressedKeys.has(digit)) 
+                    && pressedKeys.size === DOOR_CODE.length;
+  
+  if (isCorrect) {
+    status.textContent = '✅ Дверь открыта!';
+    status.style.color = '#4ade80';
+    
+    setTimeout(() => {
+      closeDoorLock();
+      
+      // ✅ ЗАМЕНИЛИ на fadeOutAndLoadEpisode
+      const cur = CONFIG.episode.id;
+      const idx = window.EP_ORDER.indexOf(cur);
+      const nextId = window.EP_ORDER[idx + 1];
+      
+      fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+    }, 1000);
+  }
+}
+
+
+
+function stepDialogue() {
+   const currentDialogue = DIALOGS[CONFIG.episode.id] || CONFIG.dialogue;
+  const node = currentDialogue ? currentDialogue[state.dialogueIndex] : null;
+  // ✅ ДОБАВИЛИ ПРОВЕРКУ НА КОФЕ-ИГРУ (ПЕРЕД ВСЕМ ОСТАЛЬНЫМ)
+  // ✅ ЛОГ ДЛЯ ОТЛАДКИ
+  console.log('📍 stepDialogue вызван');
+  console.log('Эпизод:', CONFIG.episode.id);
+  console.log('Индекс:', state.dialogueIndex);
+  console.log('Node:', node);
+
+  if (node && node.type === 'coffeeGame') {
+    console.log('☕ Запуск кофе-игры');
+    showCoffeeGame();
+    return;
+  }
+  
+  const dlgWrap = document.getElementById('dialog');
+  const dlgText = document.getElementById('dialogText');
+  const choices = document.getElementById('choices');
+  const portrait = document.getElementById('portrait');
+  
+  if (!node) {
+    // Конец диалога — переход на следующий эпизод
+    if (dlgWrap) dlgWrap.style.display = 'none';
+    if (CONFIG.episode.id === 'ep2') {    // Для ep2 (или любого эпизода)
+      console.log('🔒 Показываем замок');
+      showDoorLock();
+      return; // Прерываем, не вызываем onEpisodeComplete
+    }
+    if (typeof window.onEpisodeComplete === 'function') {
+      setTimeout(() => window.onEpisodeComplete(), 3000);
+    }
+    return;
+  }
+  
+  if (choices) choices.innerHTML = '';
+  
+  if (node.choices) {
+    typeText('Выбор…');
+    node.choices.forEach(ch => {
+      const b = document.createElement('button');
+      b.className = 'btn';
+      b.textContent = ch.text;
+      b.onclick = () => {
+        state.dialogueIndex = ch.goto;
+        save();
+        stepDialogue();
+      };
+      if (choices) choices.appendChild(b);
+    });
+    if (portrait) portrait.src = getMatrixPortrait();
+  } else {
+    // ✅ ЗАМЕНИ ЭТУ СЕКЦИЮ:
+    if (portrait) {
+      if (node.speaker === 'matrix') {
+        portrait.src = getMatrixPortrait();
+      } else if (node.portrait) {
+        portrait.src = node.portrait;  // ⬅️ Портрет NPC
+      } else {
+        portrait.src = getMatrixPortrait();  // Дефолтный
+      }
+    }
+    if (dlgText) dlgText.textContent = '';
+    typeText(node.text, node.textColor);
+  }
+
+}
+function showDialogue() {const dlg = document.getElementById('dialog');if (dlg) dlg.style.display = 'flex';state.dialogueIndex = 0;stepDialogue();}
+function showEpisodeTitle(){ const t=$('#epTitle'); $('#epTitleText').textContent = CONFIG.episode.title; t.classList.add('show'); setTimeout(()=>{ t.classList.remove('show'); }, 2000); }
+let drag={active:false, dx:0, dy:0, el:null, obj:null};
+function startDrag(e, obj, el){ drag.active=true; drag.el=el; drag.obj=obj; drag.dx=e.clientX - obj.x; drag.dy=e.clientY - obj.y; window.addEventListener('mousemove', onDrag); window.addEventListener('mouseup', stopDrag); }
+function onDrag(e) {
+  if(!drag.active) return;
+  
+  // ✅ Сохраняем временные координаты отдельно
+  const newX = e.clientX - drag.dx;
+  const newY = e.clientY - drag.dy;
+  
+  // ✅ Меняем только визуальное положение, НЕ исходные данные
+  drag.el.style.left = newX + 'px';
+  drag.el.style.top = newY + 'px';
+  
+  // ✅ Обновляем объект только при остановке (в stopDrag)
+}
+
+function stopDrag() {
+    if (!drag.active) return;
+    
+    if (state.editor) {
+        // Пересчитываем обратно в базовые координаты
+        const BASE_WIDTH = 1536;
+        const BASE_HEIGHT = 1024;
+        
+        const sceneWidth = CACHED_SCENE_WIDTH || window.innerWidth;
+        const sceneHeight = CACHED_SCENE_HEIGHT || window.innerHeight;
+        
+        const scaleX = sceneWidth / BASE_WIDTH;
+        const scaleY = sceneHeight / BASE_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const actualWidth = BASE_WIDTH * scale;
+        const actualHeight = BASE_HEIGHT * scale;
+        
+        const offsetX = (sceneWidth - actualWidth) / 2;
+        const offsetY = (sceneHeight - actualHeight) / 2;
+        
+        // Текущие экранные координаты
+        const screenX = parseInt(drag.el.style.left);
+        const screenY = parseInt(drag.el.style.top);
+        
+        // Пересчитываем в базовые координаты фона
+        const baseX = Math.round((screenX - offsetX) / scale);
+        const baseY = Math.round((screenY - offsetY) / scale);
+        
+        // Обновляем в объекте
+        drag.obj.x = baseX;
+        drag.obj.y = baseY;
+        
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log(`📍 Предмет перемещён: ${drag.obj.id}`);
+        console.log(`   Экранные координаты: (${screenX}, ${screenY})`);
+        console.log(`   Базовые координаты: (${baseX}, ${baseY})`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📋 Скопируй в код:');
+        console.log(`   x: ${baseX},`);
+        console.log(`   y: ${baseY},`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    }
+    
+    drag.active = false;
+    window.removeEventListener('mousemove', onDrag);
+    window.removeEventListener('mouseup', stopDrag);
+}
+
+function stopDrag(){ if(!drag.active) return; drag.active=false; window.removeEventListener('mousemove', onDrag); window.removeEventListener('mouseup', stopDrag); }
+function openMenu(){const m = document.getElementById('mainMenu');m.hidden = false;document.body.classList.add('menu-open');playMenuMusic();}
+function closeMenu() {
+    state.dialogueIndex = 0;
+    
+    const m = document.getElementById('mainMenu');
+    m.style.display = 'none';
+    m.hidden = true;
+    document.body.classList.remove('menu-open');
+    
+    loadScene();
+    
+// ✅ КЭШИРУЕМ размеры окна ДО любых попапов
+    setTimeout(() => {
+        cacheSceneDimensions(); // ← Сохраняем размеры
+        renderObjects();
+        
+        const dlg = document.getElementById('dialog');
+        if (dlg) {
+            dlg.style.cssText = 'position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex !important; visibility: visible !important; z-index: 35;';
+            stepDialogue();
+        }
+    }, 500);
+
+    playEpisodeMusic(CONFIG.episode.music);
+    showEpisodeTitle();
+    
+   wireUI();
+}
+
+
+const PERSONA_ORDER = ['classic','vampire','lovelas'];
+function openPersonaCarousel(){const cur = state.persona || 'classic'; let idx = Math.max(0, PERSONA_ORDER.indexOf(cur));const modal = document.createElement('div'); modal.className='main-menu';modal.style.background = "center / cover no-repeat url('assets/img/pers_back.jpg')";const card = document.createElement('div'); card.className='menu-card'; card.style.maxWidth='560px';card.innerHTML = `<h1>Персонализация</h1><div style="position:relative;display:flex;align-items:center;justify-content:center;height:360px;overflow:hidden"><img id="pLeft"  style="position:absolute;right:57%;width:180px;opacity:.35;filter:grayscale(40%);border-radius:50%;border:2px solid rgba(0,0,0,.2);"><img id="pCenter" style="width:330px;border-radius:50%;"><img id="pRight" style="position:absolute;left:57%;width:180px;opacity:.35;filter:grayscale(40%);border-radius:50%;border:2px solid rgba(0,0,0,.2);"><button id="pPrev" class="btn" style="position:absolute;left:8px;top:calc(50% - 18px)">&larr;</button><button id="pNext" class="btn" style="position:absolute;right:8px;top:calc(50% - 18px)">&rarr;</button></div><div id="pName" style="text-align:center;font-weight:700;margin-top:4px"></div><div style="display:flex;justify-content:center;gap:12px;margin-top:10px"><button id="pChoose" class="btn">Выбрать</button><button id="pClose" class="btn">Закрыть</button></div>`;modal.appendChild(card); document.body.appendChild(modal);const pLeft = card.querySelector('#pLeft');const pCenter = card.querySelector('#pCenter');const pRight = card.querySelector('#pRight');const pName = card.querySelector('#pName');function at(i){ return CONFIG.persona.options[PERSONA_ORDER[(i+PERSONA_ORDER.length)%PERSONA_ORDER.length]]; }function render(playSfx = true){const left  = at(idx-1), mid = at(idx), right = at(idx+1);pLeft.src = left.portrait; pRight.src = right.portrait; pCenter.src = mid.portrait;pName.textContent = `${mid.name}`;if (playSfx && mid.sfx) { try{ new Audio(mid.sfx).play().catch(()=>{}); }catch{} }}render(true);card.querySelector('#pPrev').onclick = ()=>{ idx--; render(true); };card.querySelector('#pNext').onclick = ()=>{ idx++; render(true); };card.querySelector('#pChoose').onclick = ()=>{const choice = PERSONA_ORDER[(idx+PERSONA_ORDER.length)%PERSONA_ORDER.length];state.persona = choice; save(); alert(CONFIG.persona.options[choice].desc || 'Выбран облик.'); modal.remove();};card.querySelector('#pClose').onclick = ()=> modal.remove();}
+function openInventoryModal() {
+    console.log('🎒 Открытие инвентаря');
+    
+    // ✅ Проверяем уже открыта?
+    let modal = document.querySelector('.main-menu.inventory-modal');
+    if (modal) {
+        console.log('⚠️ Инвентарь уже открыт');
+        return;
+    }
+    
+    // Создаём новую модалку
+    modal = document.createElement('div');
+    modal.className = 'main-menu inventory-modal'; // ✅ Добавили маркер
+    
+    const card = document.createElement('div');
+    card.className = 'menu-card';
+    card.style.maxWidth = '620px';
+    card.innerHTML = `
+        <h1>Дипломат</h1>
+        <div id="invModalGrid" class="grid" style="background:#2a1f14 url('assets/img/diplomat_leather.jpg') center/cover no-repeat;border:4px solid #3b2a1a;border-radius:16px;padding:12px"></div>
+    `;
+    
+    const close = document.createElement('button');
+    close.className = 'btn';
+    close.textContent = 'Закрыть';
+    close.onclick = () => {
+        console.log('🚪 Закрытие инвентаря');
+        modal.remove();
+    };
+    
+    card.appendChild(close);
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+    
+    // Заполняем ячейки
+    const g = card.querySelector('#invModalGrid');
+    const cells = CONFIG.inventory.cols * CONFIG.inventory.rows;
+    for (let i = 0; i < cells; i++) {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        g.appendChild(c);
+    }
+    
+    CONFIG.objects.filter(o => state.taken.includes(o.id)).forEach((o, idx) => {
+        const cell = g.children[idx];
+        if (!cell) return;
+        const im = document.createElement('img');
+        im.src = o.img;
+        cell.appendChild(im);
+    });
+    
+    console.log('✅ Инвентарь открыт');
+}
+
+
+
+function openEpisodesModal(){const modal=document.createElement('div'); modal.className='main-menu';const card=document.createElement('div'); card.className='menu-card'; card.style.maxWidth='560px';card.innerHTML = `<h1>Эпизоды</h1><div id="epsList" class="menu-grid"></div>`;const list = card.querySelector('#epsList');CONFIG.episodesList.forEach(ep=>{const b=document.createElement('button'); b.className='btn'; b.textContent=ep.title + (ep.unlocked?'':' 🔒');b.onclick = ()=>{if (!ep.unlocked) { alert('Эпизод ещё не разблокирован'); return; }CONFIG.episode.id = ep.id;CONFIG.episode.title = ep.title;CONFIG.dialogue = DIALOGS[ep.id] || DIALOGS.ep1;save(); modal.remove(); closeMenu();};list.appendChild(b);});const close=document.createElement('button'); close.className='btn'; close.textContent='Закрыть'; close.onclick=()=>modal.remove();card.appendChild(close); modal.appendChild(card); document.body.appendChild(modal);}
+function openAbout(){const modal=document.createElement('div'); modal.className='main-menu';const card=document.createElement('div'); card.className='menu-card';card.innerHTML = `<h1>Об авторе</h1><p>Никита Олюшин — консультант-аналитик в ТГ «Фарма».</p><p>Для связи: <a href="https://t.me/himyusernameis" target="_blank" style="color:#ffd93b; text-decoration:none;">@himyusernameis</a> (Telegram).</p><p>Донаты не принимаются ни в каком виде, <u>ни под каким предлогом</u></p>`;const close=document.createElement('button'); close.className='btn'; close.textContent='Закрыть'; close.onclick=()=>modal.remove();card.appendChild(close); modal.appendChild(card); document.body.appendChild(modal);}
+
+
+// Текст дисклеймера
+const DISCLAIMER_TEXT = `⚠️  ДИСКЛЕЙМЕР  ⚠️ 
+
+Это произведение является вымышленным.
+Все персонажи, события и названия — плод воображения автора.
+
+Любые совпадения с реальными людьми, организациями 
+или событиями являются случайными.
+
+Продолжая игру, вы подтверждаете, что ознакомлены
+с данным предупреждением.`;
+
+// Функция печатающего текста
+function typeWriter(element, text, speed = 30) {
+    return new Promise((resolve) => {
+        let i = 0;
+        element.innerHTML = '';
+        
+        // Заменяем все \n на <br>
+        const html = text.replace(/\n/g, '<br>');
+        
+        function type() {
+            if (i < html.length) {
+                element.innerHTML = html.substring(0, i + 1);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                resolve();
+            }
+        }
+        
+        type();
+    });
+}
+
+
+// Сохранение результата в Firebase
+function saveResultToFirebase() {
+  // Не сохраняем пустые результаты
+  if (state.score <= 0) {
+    console.log('⏭️ Пропуск: нет очков для сохранения');
+    return;
+  }
+  
+  if (!state.nickname || state.nickname.trim() === '') {
+    console.error('❌ Никнейм не указан!');
+    return;
+  }
+
+  console.log('💾 Ищу запись для никнейма:', state.nickname);
+
+  // Ищем существующую запись с этим никнеймом
+  database.ref('leaderboard')
+    .orderByChild('nickname')
+    .equalTo(state.nickname)
+    .once('value')
+    .then((snapshot) => {
+      const result = {
+        nickname: state.nickname,
+        score: state.score,
+        itemsCollected: state.taken.length,
+        timestamp: Date.now(),
+        date: new Date().toLocaleString('ru-RU')
+      };
+
+      if (snapshot.exists()) {
+        // Запись найдена — обновляем если новый счёт выше
+        let existingKey = null;
+        let existingScore = 0;
+
+        snapshot.forEach((child) => {
+          existingKey = child.key;
+          existingScore = child.val().score || 0;
+        });
+
+        if (state.score > existingScore) {
+          // Обновляем запись
+          console.log(`🔄 Обновляю рекорд: ${existingScore} → ${state.score}`);
+          database.ref('leaderboard/' + existingKey).update(result)
+            .then(() => console.log('✅ Рекорд обновлён!'))
+            .catch(err => console.error('❌ Ошибка обновления:', err));
+        } else {
+          console.log(`⏭️ Рекорд не побит (текущий: ${existingScore}, новый: ${state.score})`);
+        }
+      } else {
+        // Записи нет — создаём новую
+        console.log('➕ Создаю новую запись');
+        database.ref('leaderboard').push(result)
+          .then(() => console.log('✅ Результат сохранён!'))
+          .catch(err => console.error('❌ Ошибка сохранения:', err));
+      }
+    })
+    .catch((error) => {
+      console.error('❌ Ошибка поиска:', error);
+    });
+}
+
+// Загрузка таблицы лидеров
+function loadLeaderboard() {
+  console.log('📊 Загружаю таблицу лидеров...');
+
+  database.ref('leaderboard')
+    .orderByChild('score')
+    .limitToLast(20)  // Топ-20 игроков
+    .once('value')
+    .then((snapshot) => {
+      const leaders = [];
+      
+      snapshot.forEach((childSnapshot) => {
+        leaders.push(childSnapshot.val());
+      });
+
+      // Сортируем по убыванию score
+      leaders.reverse();
+
+      console.log('✅ Загружено игроков:', leaders.length);
+      displayLeaderboard(leaders);
+    })
+    .catch((error) => {
+      console.error('❌ Ошибка загрузки:', error);
+      alert('Ошибка загрузки таблицы: ' + error.message);
+    });
+}
+// Отображение таблицы лидеров
+function displayLeaderboard(leaders) {
+  // Находим контейнер для таблицы (нужно будет создать в HTML)
+  let leaderboardDiv = document.getElementById('leaderboardContent');
+  
+  if (!leaderboardDiv) {
+    console.error('❌ Элемент leaderboardContent не найден!');
+    return;
+  }
+
+  if (leaders.length === 0) {
+    leaderboardDiv.innerHTML = '<p style="text-align:center; color:#888;">Пока нет результатов</p>';
+    return;
+  }
+
+  let html = '<table style="width:100%; color:var(--text); border-collapse: collapse;">';
+  html += '<thead><tr style="border-bottom: 2px solid var(--neon);">';
+  html += '<th style="padding:10px; text-align:left;">Место</th>';
+  html += '<th style="padding:10px; text-align:left;">Никнейм</th>';
+  html += '<th style="padding:10px; text-align:center;">Очки</th>';
+  html += '<th style="padding:10px; text-align:center;">Предметов</th>';
+  html += '<th style="padding:10px; text-align:right;">Дата</th>';
+  html += '</tr></thead><tbody>';
+
+  leaders.forEach((leader, index) => {
+    const place = index + 1;
+    const medal = place === 1 ? '🥇' : place === 2 ? '🥈' : place === 3 ? '🥉' : place;
+    
+    html += `<tr style="border-bottom: 1px solid rgba(255,217,59,0.2);">`;
+    html += `<td style="padding:10px; font-size:20px;">${medal}</td>`;
+    html += `<td style="padding:10px; color:var(--neon);">${leader.nickname}</td>`;
+    html += `<td style="padding:10px; text-align:center; font-weight:bold;">${leader.score}</td>`;
+    html += `<td style="padding:10px; text-align:center;">${leader.itemsCollected}</td>`;
+    html += `<td style="padding:10px; text-align:right; font-size:12px; color:#888;">${leader.date}</td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table>';
+  leaderboardDiv.innerHTML = html;
+}
+
+// Загрузка сохранения
+function load() {
+    const s = localStorage.getItem('noirGameState');
+    if (!s) return;
+    
+    try {
+        const loaded = JSON.parse(s);
+        state.taken = loaded.taken || [];
+        state.score = loaded.score || 0;
+        state.dialogueIndex = loaded.dialogueIndex || 0;
+        state.disclaimerShown = loaded.disclaimerShown || false;
+    } catch (e) {
+        console.warn('Не удалось загрузить сохранение', e);
+    }
+}
+
+// Вызови загрузку при старте
+load();
+
+// ========================================
+// МИНИ-ИГРА: ВЗЛОМ СЕЙФА
+// ========================================
+
+let safeCombination = [6, 7, 5]; // Правильная комбинация
+let currentPosition = 0; // Текущая активная позиция (0, 1, 2)
+let userCombination = [0, 0, 0]; // Введённые пользователем цифры
+
+// Открыть окно взлома сейфа
+function openSafeCrackGame() {
+    console.log('🔓 Открываю мини-игру взлома сейфа');
+    
+    const overlay = document.getElementById('safeCrackOverlay');
+    if (!overlay) {
+        console.error('❌ Элемент #safeCrackOverlay не найден!');
+        return;
+    }
+    
+    overlay.style.display = 'flex';
+    
+    // Сброс значений
+    currentPosition = 0;
+    userCombination = [0, 0, 0];
+    
+    updateDigitDisplays();
+    highlightActiveDigit();
+    
+    // Привязываем события
+    setupSafeGameEvents();
+}
+
+// Настройка событий
+function setupSafeGameEvents() {
+    console.log('⚙️ Настройка событий мини-игры');
+    
+    // Кнопки стрелок вверх/вниз
+    document.querySelectorAll('.disk-arrow').forEach(arrow => {
+        arrow.onclick = (e) => {
+            e.stopPropagation();
+            const diskIndex = parseInt(arrow.dataset.disk);
+            const isUp = arrow.classList.contains('disk-up');
+            
+            console.log(`🔼 Стрелка ${isUp ? 'вверх' : 'вниз'} для диска ${diskIndex}`);
+            
+            changeDiskValue(diskIndex, isUp ? 1 : -1);
+            
+            
+        };
+    });
+    
+    // Клик по цифрам для выбора позиции
+    document.querySelectorAll('.digit-display').forEach((digit, index) => {
+        digit.onclick = () => {
+            console.log('🔘 Выбрана позиция:', index);
+            currentPosition = index;
+            highlightActiveDigit();
+           
+        };
+    });
+    
+    // Кнопка "Открыть"
+    const submitBtn = document.getElementById('safeCrackSubmit');
+    if (submitBtn) {
+        submitBtn.onclick = () => {
+            console.log('🔘 Нажата кнопка "Открыть"');
+            checkSafeCombination();
+        };
+    }
+    
+    // Кнопка "Закрыть"
+    const closeBtn = document.getElementById('safeCrackClose');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            console.log('🔘 Нажата кнопка "Закрыть"');
+            closeSafeCrackGame();
+        };
+    }
+    
+    // Закрытие по клику на overlay
+    const overlay = document.getElementById('safeCrackOverlay');
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            closeSafeCrackGame();
+        }
+    };
+}
+
+// Изменить значение диска
+function changeDiskValue(diskIndex, delta) {
+    userCombination[diskIndex] = (userCombination[diskIndex] + delta + 10) % 10;
+    updateDigitDisplays();
+    console.log('📊 Комбинация:', userCombination);
+}
+
+// Закрыть окно
+function closeSafeCrackGame() {
+    console.log('❌ Закрываю мини-игру');
+    document.getElementById('safeCrackOverlay').style.display = 'none';
+}
+
+// Обновить отображение цифр
+function updateDigitDisplays() {
+    document.getElementById('digit1').textContent = userCombination[0];
+    document.getElementById('digit2').textContent = userCombination[1];
+    document.getElementById('digit3').textContent = userCombination[2];
+}
+
+// Подсветка активной позиции
+function highlightActiveDigit() {
+    const digits = document.querySelectorAll('.digit-display');
+    
+    digits.forEach((digit, index) => {
+        if (index === currentPosition) {
+            digit.classList.add('active');
+        } else {
+            digit.classList.remove('active');
+        }
+    });
+}
+
+// Проверка комбинации
+function checkSafeCombination() {
+    console.log('🔍 Проверка комбинации:', userCombination, 'vs', safeCombination);
+    
+    const isCorrect = userCombination.every((digit, index) => digit === safeCombination[index]);
+    
+    if (isCorrect) {
+        console.log('✅ ПРАВИЛЬНАЯ КОМБИНАЦИЯ!');
+        onSafeCracked();
+    } else {
+        console.log('❌ Неправильная комбинация');
+        
+        // Тряска окна
+        const window = document.querySelector('.safeCrack-window');
+        window.classList.add('shake');
+        
+        // Звук отказа
+       
+        
+        setTimeout(() => {
+            window.classList.remove('shake');
+        }, 400);
+    }
+}
+
+// Успешный взлом
+function onSafeCracked() {
+    console.log('✅ Сейф взломан!');
+    if (state.safeCracked) {
+        console.log('⚠️ Сейф уже был взломан, пропускаем повторный вызов');
+        return;
+    }
+    console.log('📍 Текущий эпизод:', CONFIG.episode.id);
+    console.log('💾 state.dialogueIndex:', state.dialogueIndex);
+    console.log('📊 CONFIG.dialogue.length:', CONFIG.dialogue.length);
+    
+    // Сохраняем состояние
+    state.safeCracked = true;
+    save();
+    
+    // Закрываем окно
+    closeSafeCrackGame();
+    
+    // Меняем спрайт сейфа
+    const safeObj = CONFIG.objects.find(obj => obj.id === 'safe' && obj.episode === 'ep6');
+    if (safeObj) {
+        safeObj.img = 'assets/img/vault_open3.png';
+        // ✅ ФИКСИРОВАННЫЙ РАЗМЕР ДЛЯ ОТКРЫТОГО СЕЙФА
+    safeObj.scale = 1.1; // Подбери нужный размер
+    console.log('🔄 Сейф открыт, scale установлен:', safeObj.scale);
+
+    }
+    
+    
+    // Показываем презерватив внутри
+const condomObj = CONFIG.objects.find(
+  obj => obj.id === 'Контроцептив' && obj.episode === 'ep6'
+);
+if (condomObj) {
+  condomObj.visible = true; // ✅ станет виден только после взлома
+}
+
+    
+    // Перерисовываем сцену
+    renderObjects();
+
+   
+    // Сообщение
+   // showMessage('Сейф открыт! Внутри лежит.....');
+    alert('Сейф открыт! Внутри лежит контрацептив...');
+    // Звук открытия
+    playSfx('assets/audio/sfx_you_win.mp3');
+
+// ✅ Проверяем что мы в эпизоде 6
+if (CONFIG.episode.id === 'ep6') {
+  console.log('🔁 Сейф взломан, запускаем переход на эпизод 7');
+  
+  setTimeout(() => {
+    window.onEpisodeComplete();
+  }, 7000); // 3 секунды чтобы увидеть открытый сейф и сообщение
+}
+
+}
+
+
+// Привязка событий к окну сейфа
+function initSafeCrackEvents() {
+    // Скролл на колесе
+    const diskWheel = $('#diskWheel');
+    if (diskWheel) {
+        diskWheel.addEventListener('wheel', handleDiskScroll, { passive: false });
+        diskWheel.addEventListener('click', selectNextPosition);
+    }
+    
+    // Кнопка "Открыть"
+    const submitBtn = $('#safeCrackSubmit');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', checkSafeCombination);
+    }
+    
+    // Кнопка "Закрыть"
+    const closeBtn = $('#safeCrackClose');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSafeCrackGame);
+    }
+    
+    // Закрытие по клику на overlay
+    const overlay = $('#safeCrackOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeSafeCrackGame();
+            }
+        });
+    }
+}
+
+
+// Конфигурация кофе-машины
+const COFFEE_RECIPE = {
+  order: ['coffee', 'water', 'milk', 'cinnamon', 'syrup'],
+  images: {
+    0: 'assets/img/coffe_cup_empty.png',
+    1: 'assets/img/coffe_cup_coffee.png',      // Только кофе
+    2: 'assets/img/coffe_cup_coffee.png',
+    3: 'assets/img/coffe_cup_milk.png',        // Кофе + вода
+    4: 'assets/img/coffe_cup_cinnamon.png',    // + корица
+    5: 'assets/img/coffe_cup_syrup.png',       // + сироп
+    6: 'assets/img/coffe_cup_syrup.png'     // Готовый латте
+  },
+  names: {
+    coffee: 'кофе',
+    water: 'воду',
+    milk: 'молоко',
+    cinnamon: 'корицу',
+    syrup: 'сироп'
+    
+  }
+};
+
+let coffeeState = {
+  added: [],
+  currentStep: 0
+};
+
+// Открыть кофе-игру
+function showCoffeeGame() {
+  console.log('☕ Открытие кофе-машины');
+  
+  const game = document.getElementById('coffeeGame');
+  game.style.display = 'flex';
+  
+  // Сброс состояния
+  coffeeState.added = [];
+  coffeeState.currentStep = 0;
+  
+  updateCoffeeCup();
+  updateProgress();
+  updateHint();
+  
+  // Сброс ингредиентов
+  document.querySelectorAll('.ingredient').forEach(ing => {
+    ing.classList.remove('used');
+  });
+  
+  // Drag-and-drop обработчики
+  const cupArea = document.querySelector('.coffee-cup-area');
+  const ingredients = document.querySelectorAll('.ingredient');
+  
+  ingredients.forEach(ing => {
+    ing.addEventListener('dragstart', handleDragStart);
+    ing.addEventListener('dragend', handleDragEnd);
+  });
+  
+  cupArea.addEventListener('dragover', handleDragOver);
+  cupArea.addEventListener('dragleave', handleDragLeave);
+  cupArea.addEventListener('drop', handleDrop);
+}
+
+// Закрыть кофе-игру
+function closeCoffeeGame() {
+  const game = document.getElementById('coffeeGame');
+  game.style.display = 'none';
+}
+
+// Обработчики drag-and-drop
+let draggedIngredient = null;
+
+function handleDragStart(e) {
+  draggedIngredient = e.target.closest('.ingredient').dataset.ingredient;
+  e.target.closest('.ingredient').style.opacity = '0.5';
+  console.log('🎯 Начало перетаскивания:', draggedIngredient);
+}
+
+function handleDragEnd(e) {
+  e.target.closest('.ingredient').style.opacity = '1';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  
+  const glow = document.getElementById('cupGlow');
+  glow.classList.add('active');
+}
+
+function handleDragLeave(e) {
+  const glow = document.getElementById('cupGlow');
+  glow.classList.remove('active');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  
+  const glow = document.getElementById('cupGlow');
+  glow.classList.remove('active');
+  
+  if (!draggedIngredient) return;
+  
+  // ✅ ПРОВЕРКА ПРАВИЛЬНОГО ПОРЯДКА
+  const expectedIngredient = COFFEE_RECIPE.order[coffeeState.currentStep];
+  
+  if (draggedIngredient !== expectedIngredient) {
+    console.log('❌ Неправильный ингредиент! Ожидается:', expectedIngredient);
+    showError(`Сначала добавьте ${COFFEE_RECIPE.names[expectedIngredient]}!`);
+    return;
+  }
+  
+  // ✅ Добавляем ингредиент
+  console.log('✅ Добавлен:', draggedIngredient);
+  coffeeState.added.push(draggedIngredient);
+  coffeeState.currentStep++;
+  
+  // Отмечаем как использованный
+  const ingElement = document.querySelector(`.ingredient[data-ingredient="${draggedIngredient}"]`);
+  if (ingElement) ingElement.classList.add('used');
+  
+  // Обновляем стаканчик
+  updateCoffeeCup();
+  updateProgress();
+  updateHint();
+  
+  // Проверка завершения
+  if (coffeeState.currentStep === 5) {
+    setTimeout(() => {
+      completeCoffeeGame();
+    }, 800);
+  }
+  
+  draggedIngredient = null;
+}
+
+// Обновить изображение стаканчика
+function updateCoffeeCup() {
+  const cup = document.getElementById('coffeeCup');
+  const step = coffeeState.currentStep;
+  
+  // Анимация наливания
+  cup.classList.add('pour');
+  setTimeout(() => cup.classList.remove('pour'), 500);
+  
+  // Смена изображения по шагу
+  cup.src = COFFEE_RECIPE.images[step];
+  
+  console.log('☕ Шаг:', step, 'PNG:', cup.src);
+}
+
+// Обновить прогресс
+function updateProgress() {
+  const progress = document.getElementById('coffeeProgress');
+  progress.textContent = `${coffeeState.currentStep}/5`;
+  
+  if (coffeeState.currentStep >= 3) {
+    progress.style.color = '#ffd93b';
+  }
+  if (coffeeState.currentStep === 5) {
+    progress.style.color = '#4ade80';
+  }
+}
+
+// Обновить подсказку
+function updateHint() {
+  const hint = document.querySelector('.coffee-hint');
+  
+  if (coffeeState.currentStep < 5) {
+    const nextIngredient = COFFEE_RECIPE.order[coffeeState.currentStep];
+    hint.textContent = `Текущий шаг: добавьте ${COFFEE_RECIPE.names[nextIngredient]}`;
+    hint.style.color = '#ffd93b';
+  } else {
+    hint.textContent = 'Кофе готов! Вы великолепны!';
+    hint.style.color = '#4ade80';
+  }
+}
+
+// Показать ошибку
+function showError(text) {
+  const hint = document.querySelector('.coffee-hint');
+  const originalText = hint.textContent;
+  const originalColor = hint.style.color;
+  
+  hint.textContent = '❌ ' + text;
+  hint.style.color = '#ff6b6b';
+  
+  // Встряхивание стаканчика
+  const cup = document.getElementById('coffeeCup');
+  cup.style.animation = 'shake 0.4s ease';
+  
+  setTimeout(() => {
+    hint.textContent = originalText;
+    hint.style.color = originalColor;
+    cup.style.animation = '';
+  }, 1500);
+}
+
+// Завершение игры
+function completeCoffeeGame() {
+  console.log('🎉 Кофе готов!');
+  
+  const hint = document.querySelector('.coffee-hint');
+  hint.textContent = '✅ Кофе готов! Приятного аппетита!';
+  hint.style.color = '#4ade80';
+  hint.style.fontSize = '18px';
+  hint.style.fontWeight = 'bold';
+  
+  // Закрытие через 2 сек
+  setTimeout(() => {
+    closeCoffeeGame();
+    
+    // Продолжаем диалог
+    state.dialogueIndex++;
+    save();
+    stepDialogue();
+  }, 2000);
+}
+
+
+
+
+function wireUI() {
+    // Кнопка "Продолжить"
+    const btnContinue = document.getElementById('btnContinue');
+    if (btnContinue) {
+        btnContinue.onclick = () => {
+            const nickInput = document.getElementById('nickname');
+            const n = (nickInput?.value || state.nickname || 'Player').trim();
+            if (!validNick(n)) return alert('Ник: латиница/цифры/_ , 3–16');
+            state.nickname = n;
+            save();
+            closeMenu();
+        };
+    }
+    
+    const btnNew = document.getElementById('btnNew');
+if (btnNew) {
+  btnNew.onclick = async () => {
+    if (!confirm('Начать новую игру?')) return;
+    
+    // Получаем никнейм из поля
+    const nickInput = document.getElementById('nickname');
+    const n = (nickInput?.value || state.nickname || 'Player').trim();
+    if (!validNick(n)) return alert('Ник: латиница/цифры/_ , 3–16');
+    
+    console.log('🎮 Новая игра начата');
+    
+    // Сброс состояния 
+    state.nickname = n;
+    state.score = 0;
+    state.taken = [];
+    state.dialogueIndex = 0;
+    state.disclaimerShown = false;
+    state.scene = 'ep1';
+
+    CONFIG.episode = {
+      id: 'ep1',
+      title: 'Эпизод 1',
+      bg: 'assets/img/hall_back.png',
+      music: 'assets/audio/music_ep1.mp3'
+    };
+    CONFIG.dialogue = DIALOGS.ep1;
+    
+    save();
+    buildInventory();        
+    loadScene();
+    renderObjects();
+    closeMenu();
+
+     await showDisclaimer();
+  };
+}
+  
+    // Остальные кнопки
+    initSafeCrackEvents();
+    
+    const btnPersona = document.getElementById('btnPersona');
+    if (btnPersona) {
+        btnPersona.onclick = openPersonaCarousel;
+    }
+    
+    const btnInv = document.getElementById('btnInventory');
+    if (btnInv) {
+        btnInv.onclick = () => {
+            console.log('🎒 Клик по инвентарю');
+            openInventoryModal();
+        };
+    }
+    
+    const btnAbout = document.getElementById('btnAbout');
+    if (btnAbout) {
+        btnAbout.onclick = openAbout;
+    }
+    
+    const btnEditor = document.getElementById('btnEditor');
+    if (btnEditor) {
+        btnEditor.onclick = (e) => {
+            state.editor = !state.editor;
+            e.target.textContent = `Редактор позиций: ${state.editor ? 'вкл' : 'выкл'}`;
+        };
+    }
+    
+    // Глобальный клик (оставляем addEventListener, т.к. это window)
+    window.addEventListener('click', (e) => {
+        // Игнорируем клики по кнопкам, контексту и объектам
+        if (e.target.closest('.btn') || e.target.closest('.ctx') || e.target.closest('.obj')) {
+            return;
+        }
+        closeContext();
+    });
+    
+    const btnInvToggle = document.getElementById('btnInvToggle');
+    if (btnInvToggle) {
+        btnInvToggle.onclick = () => {
+            const inv = document.getElementById('inv');
+            inv.classList.toggle('open');
+        };
+    }
+    
+    const btnMenu = document.getElementById('btnMenu');
+    if (btnMenu) {
+        btnMenu.onclick = () => {
+            const dlg = document.getElementById('dialog');
+            if (dlg) dlg.style.display = 'none';
+            
+            const m = document.getElementById('mainMenu');
+            m.style.display = 'grid';
+            m.hidden = false;
+            document.body.classList.add('menu-open');
+            
+            music.pause();
+            playMenuMusic();
+        };
+    }
+const btnLeaders = document.getElementById('btnLeaders');
+if (btnLeaders) {
+  btnLeaders.addEventListener('click', openLeaderboard);
+  console.log('✅ Кнопка "Таблица лидеров" подключена');
+}
+}
+// Вызов ОДИН РАЗ при загрузке
+window.addEventListener('DOMContentLoaded', () => {
+    wireUI();
+});
+
+
+    
+   
+
+
+
+// Кнопка "Звук"
+let soundEnabled = true;
+document.getElementById('btnSound')?.addEventListener('click', (e) => {
+  soundEnabled = !soundEnabled;
+  music.volume = soundEnabled ? 0.6 : 0;
+  e.target.textContent = soundEnabled ? '🔊' : '🔇';
+});
+
+function init(){document.body.classList.add('menu-open');loadScene(); buildInventory(); renderObjects();wireUI();openMenu();}
+document.addEventListener('DOMContentLoaded', init);
+// Переход на следующую реплику по клику или пробелу
+let dialogueReady = false;
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#dialog') && !e.target.closest('.btn') && !e.target.closest('.choices')) {
+    const node = CONFIG.dialogue[state.dialogueIndex];
+    if (node && !node.choices) {
+      state.dialogueIndex++;
+      save();
+      stepDialogue();
+    }
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !document.body.classList.contains('menu-open')) {
+    e.preventDefault();
+    
+    const node = CONFIG.dialogue[state.dialogueIndex];
+    if (!node || node.choices) return;
+    
+    // ✅ Если текст печатается — показываем мгновенно
+    if (currentTypeTimer) {
+      clearInterval(currentTypeTimer);
+      currentTypeTimer = null;
+      const dlgText = document.getElementById('dialogText');
+      if (dlgText) dlgText.textContent = node.text;
+    } else {
+      // ✅ Если текст допечатан — переход на следующий
+      state.dialogueIndex++;
+      save();
+      stepDialogue();
+    }
+  }
+});
+
+
+// ========================================
+// ПРОВЕРКА ЗАВЕРШЕНИЯ ЭПИЗОДА 6
+// ========================================
+
+
+function checkEpisode6Complete() {
+  const allDialoguesHeard = state.dialogueIndex >= CONFIG.dialogue.length;
+  const safeCracked = !!state.safeCracked;
+
+  console.log('🔍 Проверка эпизода 6:', {
+    allDialoguesHeard,
+    safeCracked,
+    dlgIndex: state.dialogueIndex,
+    totalDlg: CONFIG.dialogue.length
+  });
+
+  if (!allDialoguesHeard) {
+    return false;
+  }
+
+  if (allDialoguesHeard && !safeCracked) {
+
+  alert('Матрикс: Я обязан вскрыть этот сейф и узнать, что там находится.'); // временно
+  return false;
+}
+
+
+  return true;
+}
+
+// Автопереход между эпизодами
+window.EP_ORDER = ['ep1','ep2','ep3','ep4','ep5','ep6','ep7','ep8'];
+
+
+
+window.onEpisodeComplete = function(){
+  console.log('🎬 Episode complete! Current:', CONFIG.episode.id);
+  
+  const cur = CONFIG.episode.id;
+  const idx = window.EP_ORDER.indexOf(cur);
+  const nextId = window.EP_ORDER[idx + 1];
+  
+  console.log('➡️ Next episode:', nextId);
+  
+  // ✅ ПРОВЕРКА ДЛЯ ПОСЛЕДНЕГО ЭПИЗОДА
+  if (!nextId) {
+    console.log('🎉 Игра завершена! Возврат в главное меню');
+    
+    const overlay = document.getElementById('transitionOverlay');
+    overlay.classList.add('active'); // Затемнение
+    
+    setTimeout(() => {
+      // Возврат в главное меню
+      location.reload(); // ← Или вызови функцию главного меню
+    }, 1500); // 1.5 секунды на затемнение
+    
+    return;
+  }
+
+  // ✅ ПРОВЕРКА ДЛЯ ЭПИЗОДА 2 (ЗАМОК)
+  if (cur === 'ep2') {
+    console.log('🔒 Эпизод 2 завершён, показываем замок');
+    showDoorLock();
+    return;
+  }
+  
+  // ✅ ПРОВЕРКА ДЛЯ ЭПИЗОДА 6
+  if (cur === 'ep6') {
+    if (!checkEpisode6Complete()) {
+      console.log('⚠️ Эпизод 6: сейф не вскрыт, блокируем переход');
+      return;
+    }
+    
+    console.log('⏳ Ждём 5 секунд перед переходом на ep7...');
+    setTimeout(() => {
+      fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+    }, 5000);
+    
+    return;
+  }
+  
+  // ✅ Обычный переход для других эпизодов
+  fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+};
+
+// ✅ ВЫНЕСЛИ ЛОГИКУ ЗАГРУЗКИ В ОТДЕЛЬНУЮ ФУНКЦИЮ (чтобы не дублировать)
+function loadNextEpisode(nextId, idx) {
+  if (nextId && DIALOGS[nextId]) {
+    console.log('✅ Переход на эпизод:', nextId);
+    
+    const epEntry = CONFIG.episodesList.find(e => e.id === nextId);
+    if (epEntry) epEntry.unlocked = true;
+    
+    CONFIG.episode.id = nextId;
+    CONFIG.episode.title = `Эпизод ${idx + 2}`;
+    CONFIG.episode.bg = EPISODE_BACKGROUNDS[nextId] || 'assets/img/hall_back.png';
+    CONFIG.episode.music = EPISODE_MUSIC[nextId] || 'assets/audio/music_ep1.mp3';
+    CONFIG.dialogue = DIALOGS[nextId];
+    
+    console.log('📦 CONFIG обновлён:', CONFIG.episode);
+    
+    state.dialogueIndex = 0;
+    save();
+    
+    loadScene();
+    renderObjects();
+    playEpisodeMusic(CONFIG.episode.music);
+    showEpisodeTitle();
+    
+    setTimeout(() => {
+      console.log('💬 Показываю диалог через 500мс');
+      renderObjects();
+      const dlg = document.getElementById('dialog');
+      if (dlg) {
+        dlg.style.cssText = 'position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex !important; visibility: visible !important; z-index: 35;';
+      }
+      stepDialogue();
+    }, 500);
+  } else {
+    console.log('❌ Нет следующего эпизода или диалога');
+  }
+}
+
+
+
+
+// ✅ Конфигурация всех эпизодов
+if(typeof window.EPCONFIG === 'undefined'){
+  window.EPCONFIG = {
+    ep1: { 
+      id:'ep1', 
+      title:'Эпизод 1', 
+      bg:'assets/img/hallback.png', 
+      music:'assets/audio/music_ep1.mp3', 
+      dlg: DIALOGS.ep1 
+    },
+    ep2: { 
+      id:'ep2', 
+      title:'Эпизод 2', 
+      bg:'assets/img/lyuba_pic3.png', 
+      music:'assets/audio/music_ep2.mp3', 
+      dlg: DIALOGS.ep2 
+    },
+    ep3: { 
+      id:'ep3', 
+      title:'Эпизод 3', 
+      bg:'assets/img/kitchen.png', 
+      music:'assets/audio/music_ep3.mp3', 
+      dlg: DIALOGS.ep3 
+    },
+    ep4: { 
+      id:'ep4', 
+      title:'Эпизод 4', 
+      bg:'assets/img/security.png', 
+      music:'assets/audio/music_ep4.mp3', 
+      dlg: DIALOGS.ep4 
+    },
+    ep5: { 
+      id:'ep5', 
+      title:'Эпизод 5', 
+      bg:'assets/img/king_filipp.png', 
+      music:'assets/audio/music_ep5.mp3', 
+      dlg: DIALOGS.ep5 
+    },
+    ep6: { 
+      id:'ep6', 
+      title:'Эпизод 6', 
+      bg:'assets/img/willi_back2.png', 
+      music:'assets/audio/music_ep6.mp3', 
+      dlg: DIALOGS.ep6 
+    },
+    ep7: { 
+      id:'ep7', 
+      title:'Эпизод 7', 
+      bg:'assets/img/os_back.png', 
+      music:'assets/audio/music_ep7.mp3', 
+      dlg: DIALOGS.ep7 
+    },
+    ep8: { 
+      id:'ep8', 
+      title:'Эпизод 8', 
+      bg:'assets/img/smoking.png', 
+      music:'assets/audio/music_ep8.mp3', 
+      dlg: DIALOGS.ep8 
+    }
+  };
+  window.EPORDER = ['ep1','ep2','ep3','ep4','ep5','ep6','ep7','ep8'];
+}
+
+
+// ✅ Функция быстрого перехода на эпизод
+window.startEpisode = function(epId){
+  epId = epId || 'ep1';
+  
+  // Находим конфиг эпизода
+  const ep = window.EPCONFIG ? window.EPCONFIG[epId] : null;
+  if(!ep) {
+    console.error('Эпизод не найден:', epId);
+    return;
+  }
+  
+  // Обновляем CONFIG
+  CONFIG.episode.id = ep.id;
+  CONFIG.episode.title = ep.title;
+  CONFIG.episode.bg = ep.bg;
+  CONFIG.episode.music = ep.music;
+  CONFIG.dialogue = ep.dlg;
+  
+  // Сбрасываем диалог
+  if(window.state) state.dialogueIndex = 0;
+  
+  // Закрываем меню
+  const m = document.getElementById('mainMenu');
+  if(m) {
+    m.hidden = true;
+    document.body.classList.remove('menu-open');
+  }
+  
+  // Перезагружаем сцену
+  loadScene();
+  renderObjects();
+  buildInventory();
+  playEpisodeMusic(CONFIG.episode.music);
+  showDialogue();
+  showEpisodeTitle();
+  save();
+};
+
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        console.log('🔄 Window resized, updating cache...');
+        cacheSceneDimensions(); // ← Обновляем кэш при реальном resize
+        renderObjects();
+    }, 100);
+});
+
+// ========== УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ==========
+
+// Открытие таблицы лидеров
+function openLeaderboard() {
+  console.log('📊 Открываю таблицу лидеров');
+  
+  const modal = document.getElementById('leaderboardModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    loadLeaderboard(); // Загружаем данные
+  }
+}
+
+// Закрытие таблицы лидеров
+function closeLeaderboard() {
+  console.log('❌ Закрываю таблицу лидеров');
+  
+  const modal = document.getElementById('leaderboardModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+
+</script>
+
+<!-- Мини-игра взлома сейфа -->
+<div id="safeCrackOverlay" class="minigame-overlay" style="display:none;">
+    <div class="safeCrack-window">
+        <h2>Взлом кодового замка</h2>
+        
+        <div class="combination-container">
+            <!-- Первая цифра -->
+            <div class="disk-column">
+                <button class="disk-arrow disk-up" data-disk="0">▲</button>
+                <div class="digit-display active" id="digit1" data-disk="0">0</div>
+                <button class="disk-arrow disk-down" data-disk="0">▼</button>
+            </div>
+            
+            <!-- Вторая цифра -->
+            <div class="disk-column">
+                <button class="disk-arrow disk-up" data-disk="1">▲</button>
+                <div class="digit-display" id="digit2" data-disk="1">0</div>
+                <button class="disk-arrow disk-down" data-disk="1">▼</button>
+            </div>
+            
+            <!-- Третья цифра -->
+            <div class="disk-column">
+                <button class="disk-arrow disk-up" data-disk="2">▲</button>
+                <div class="digit-display" id="digit3" data-disk="2">0</div>
+                <button class="disk-arrow disk-down" data-disk="2">▼</button>
+            </div>
+        </div>
+        
+        <div class="instruction">
+            💡 <strong>Управление:</strong> Стрелки ▲▼ — изменить цифру | Клик на цифру — выбрать позицию
+        </div>
+        
+        <div class="safeCrack-buttons">
+            <button id="safeCrackSubmit" class="btn-primary">Открыть</button>
+            <button id="safeCrackClose" class="btn-secondary">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- Мини-игра: Приготовление кофе -->
+<div id="coffeeGame" class="coffee-game" style="display:none;">
+  <div class="coffee-overlay"></div>
+  <div class="coffee-container">
+    <h2>Приготовление кофе</h2>
+    <p class="coffee-hint">Следующий шаг: добавьте кофе</p>
+    
+    <!-- Стаканчик в центре -->
+    <div class="coffee-cup-area">
+      <img id="coffeeCup" src="assets/img/cup_empty.png" class="coffee-cup" alt="Стаканчик">
+      <div id="cupGlow" class="cup-glow"></div>
+    </div>
+    
+    <!-- Ингредиенты -->   
+        <div class="coffee-ingredients">
+      <div class="ingredient" draggable="true" data-ingredient="cinnamon">
+        <img src="assets/img/ingredient_cinnamon.png" alt="Корица">
+        <span>Корица</span>
+      </div>
+
+       <div class="ingredient" draggable="true" data-ingredient="water">
+        <img src="assets/img/ingredient_water.png" alt="Вода">
+        <span>Вода</span>
+      </div>
+
+      <div class="ingredient" draggable="true" data-ingredient="milk">
+        <img src="assets/img/ingredient_milk.png" alt="Молоко">
+        <span>Молоко</span>
+      </div>
+      
+      <div class="ingredient" draggable="true" data-ingredient="syrup">
+        <img src="assets/img/ingredient_syrup.png" alt="Сироп">
+        <span>Сироп</span>
+      </div>
+
+    
+      <div class="ingredient" draggable="true" data-ingredient="coffee">
+        <img src="assets/img/ingredient_coffee.png" alt="Кофе">
+        <span>Кофе</span>
+      </div>
+      </div>
+      
+    
+    <p class="coffee-status">Добавлено: <span id="coffeeProgress">0/5</span></p>
+  </div>
+</div>
+
+<!-- Оверлей для переходов между эпизодами -->
+<div id="transitionOverlay" class="transition-overlay"></div>
+
+<!-- Модальное окно таблицы лидеров -->
+<div class="leaderboard-modal" id="leaderboardModal" style="display:none;">
+  <div class="leaderboard-container">
+    <div class="leaderboard-header">
+      <h2>🏆 Таблица лидеров</h2>
+      <button class="close-btn" onclick="closeLeaderboard()">✕</button>
+    </div>
+    <div class="leaderboard-content" id="leaderboardContent">
+      <p style="text-align:center; color:#888;">Загрузка...</p>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
