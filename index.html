@@ -1158,7 +1158,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
       <p>офисный нуар кота Матрикса</p>
       <label>Никнейм/кличка/погоняло</label>
       <input type="text" id="nickname" placeholder="from 3 to 12: [a-zA-Z0-9_]" maxlength="12" />
-      <div class="hint" style="margin:6px 0 12px">Допускается: латиница/цифры/нижнее подчёркивание, 3–12 символов.</div>
+      <div class="hint" style="margin:6px 0 12px; color:#FFD700;">Допускается: латиница/цифры/нижнее подчёркивание, 3–12 символов.</div>
       <div class="menu-grid">
         <button class="btn" id="btnNew">Новая игра</button>
         <button class="btn" id="btnContinue">Продолжить</button>
@@ -1193,9 +1193,9 @@ console.log('🔥 Firebase подключен!');
    
 
 async function typeWriter(element, text, speed = 30) {
-    element.textContent = '';
+    element.innerHTML = '';
     for (let i = 0; i < text.length; i++) {
-        element.textContent += text[i];
+        element.innerHTML += text[i];
         await new Promise(resolve => setTimeout(resolve, speed));
     }
 }
@@ -1290,7 +1290,7 @@ const DIALOGS = {
 
 /* 19 */
 {"speaker":"lyuba", "portrait":"assets/img/lyuba_face2.png", "text":"..."},
-{"speaker":"chef", "portrait":"assets/img/chief_1.png", "text":"Матрикс, когда преза готова будет? где рассылка писем счастья негодяям? Иди, а я пока с Любой поговорю!"},  // ⬅️ Сразу к концу
+{"speaker":"chef", "portrait":"assets/img/chief_1.png", "text":"Матрикс, когда преза готова будет? где рассылка писем счастья негодяям? Иди, а я пока с Любой поговорю!"}, 
 {"speaker":"matrix","text":"да я вообще за кофе пришел, на третьем этаже тачка сломалась!"},
 {"speaker":"chef", "portrait":"assets/img/chief_1.png", "text":"бездельник..."},
 {"speaker":"matrix","text":"Ладно, пойду. Хорошего дня!"},
@@ -2337,22 +2337,23 @@ function typeText(text, color) {
       const clonedNode = node.cloneNode(false); 
       dlgText.appendChild(clonedNode);
       
-      const innerText = node.textContent;
+      const innerText = node.innerHTML || node.textContent;
       let innerIndex = 0;
-      
+
       const innerTimer = setInterval(() => {
         if (innerIndex < innerText.length) {
-          clonedNode.textContent += innerText[innerIndex];
+          clonedNode.innerHTML += innerText[innerIndex];
           innerIndex++;
         } else {
           clearInterval(innerTimer);
         }
       }, 60);
       
-      currentNodeIndex++;
+      currentNodeIndex++;   
     }
-  }, 60);
-}
+  }, 60);  
+}  
+
 
 const DOOR_CODE = ['0', '4', '3']; 
 let pressedKeys = new Set(); 
@@ -2508,7 +2509,8 @@ function stepDialogue() {
         portrait.src = getMatrixPortrait();  
       }
     }
-    if (dlgText) dlgText.textContent = '';
+    if (dlgText) dlgText.innerHTML = '';
+
     typeText(node.text, node.textColor);
   }
 
@@ -3472,7 +3474,8 @@ document.addEventListener('keydown', (e) => {
       clearInterval(currentTypeTimer);
       currentTypeTimer = null;
       const dlgText = document.getElementById('dialogText');
-      if (dlgText) dlgText.textContent = node.text;
+      if (dlgText) dlgText.innerHTML = node.text;
+
     } else {
       
       state.dialogueIndex++;
