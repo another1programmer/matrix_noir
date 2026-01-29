@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Matrix Cat: Office Noir — Prototype</title>
    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-<!-- Дисклеймер -->
+
 <div id="disclaimer" class="disclaimer" style="display:none;">
     <div class="disclaimer-content">
         <div id="disclaimerText" class="disclaimer-text"></div>
@@ -18,7 +18,7 @@
 
 
 
-<!-- Кодовый замок -->
+
 <div id="doorLock" class="door-lock" style="display:none;">
   <div class="lock-overlay"></div>
   <div class="lock-container">
@@ -51,7 +51,7 @@
 </script>
   <style>
 
-    /* Оверлей перехода между эпизодами */
+    
 .transition-overlay {
   position: fixed;
   top: 0;
@@ -61,16 +61,16 @@
   background: #000;
   opacity: 0;
   pointer-events: none;
-  z-index: 10000; /* Поверх всего */
+  z-index: 10000; 
   transition: opacity 1s ease-in-out;
 }
 
 .transition-overlay.active {
   opacity: 1;
-  pointer-events: all; /* Блокирует клики во время перехода */
+  pointer-events: all; 
 }
 
-/* КОФЕ-ИГРА */
+
 #coffeeGame {
   display: none;
   position: fixed !important;
@@ -230,7 +230,7 @@
 }
 
 
-/* Оверлей замка */
+
 .door-lock {
   position: fixed;
   top: 0;
@@ -253,7 +253,7 @@
   backdrop-filter: blur(8px);
 }
 
-/* Контейнер замка */
+
 .lock-container {
   position: relative;
   background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
@@ -277,7 +277,7 @@
   margin-bottom: 30px;
 }
 
-/* Кнопки замка */
+
 .lock-buttons {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -302,7 +302,7 @@
   user-select: none;
 }
 
-/* Hover */
+
 .lock-btn:hover {
   background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
   border-color: var(--accent);
@@ -311,7 +311,7 @@
     0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Активная (зажатая) кнопка */
+
 .lock-btn.pressed {
   background: linear-gradient(145deg, #ffd93b, #f0c020);
   color: #000;
@@ -322,14 +322,14 @@
     inset 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
-/* Статус */
+
 .lock-status {
   color: var(--accent);
   font-size: 16px;
   min-height: 24px;
 }
   
-/* Мини-игра взлома сейфа */
+
 .minigame-overlay {
     position: fixed;
     top: 0;
@@ -364,7 +364,7 @@
     letter-spacing: 2px;
 }
 
-/* Контейнер с дисками */
+
 .combination-container {
     display: flex;
     justify-content: center;
@@ -372,7 +372,7 @@
     margin-bottom: 30px;
 }
 
-/* Колонка одного диска */
+
 .disk-column {
     display: flex;
     flex-direction: column;
@@ -380,7 +380,7 @@
     gap: 10px;
 }
 
-/* Стрелки */
+
 .disk-arrow {
     width: 60px;
     height: 40px;
@@ -406,7 +406,7 @@
     transform: scale(0.95);
 }
 
-/* Дисплей цифры */
+
 .digit-display {
     width: 80px;
     height: 100px;
@@ -430,7 +430,7 @@
     border-color: rgba(255, 217, 59, 0.6);
 }
 
-/* Активная позиция */
+
 .digit-display.active {
     border-color: #fff;
     color: var(--accent);
@@ -438,7 +438,7 @@
     text-shadow: 0 0 15px rgba(255, 217, 59, 0.6);
 }
 
-/* Инструкция */
+
 .instruction {
     font-family: var(--font);
     font-size: 14px;
@@ -454,7 +454,7 @@
     color: var(--accent);
 }
 
-/* Кнопки */
+
 .safeCrack-buttons {
     display: flex;
     gap: 15px;
@@ -497,7 +497,7 @@
     transform: translateY(-2px);
 }
 
-/* Анимация тряски при неверном коде */
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-10px); }
@@ -513,8 +513,8 @@
     .model-viewer {
   position: fixed;
   inset: 0;
-  background-image: url('assets/img/background2.png'); /* ← Путь к картинке */
-  background-size: cover; /* Растягивает на весь экран */
+  background-image: url('assets/img/background2.png'); 
+  background-size: cover; 
   background-position: center;
   background-repeat: no-repeat;
   z-index: 100;
@@ -546,11 +546,11 @@
   text-align: center;
   max-width: 600px;
   
-  /* ✅ ДОБАВЛЯЕМ ЗАТЕМНЁННУЮ ПОДЛОЖКУ: */
-  background: rgba(50, 50, 40, 0.85); /* Серо-коричневый полупрозрачный */
+  
+  background: rgba(50, 50, 40, 0.85); 
   padding: 12px 20px;
   border-radius: 12px;
-  backdrop-filter: blur(10px); /* Размытие фона за подложкой */
+  backdrop-filter: blur(10px); 
 }
 
 
@@ -600,10 +600,10 @@
     html,body{height:100%;}
     body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text);}
     .game-root{position:relative; width:100%; height:100vh; overflow:hidden;}
-   /* Контейнер сцены с фиксированным соотношением сторон */
-/* ✅ НОВЫЙ КОД: */
+   
 
-/* Контейнер сцены занимает весь экран */
+
+
 .scene {
     position: absolute;
     inset: 0;
@@ -613,7 +613,7 @@
     overflow: hidden;
 }
 
-/* Фон сохраняет пропорции, масштабируется без обрезки */
+
 .bg {
     position: absolute;
     width: 100%;
@@ -631,12 +631,12 @@
     pointer-events: none;
 }
 
-/* Предметы позиционируются в пикселях относительно фона */
+
 .obj {
     position: absolute;
     transform: translate(-50%, -50%);
     
-    /* ✅ Контейнер НЕ реагирует на события */
+   
     pointer-events: none;
     
     display: inline-block;
@@ -655,7 +655,7 @@
     display: block;
     image-rendering: auto;
     
-    /* ✅ Только изображение реагирует */
+    
     pointer-events: auto;
     cursor: pointer;
     
@@ -668,7 +668,7 @@
 }
 
 
-/* Анимация ошибки (встряхивание) */
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
@@ -707,7 +707,7 @@
   cursor: pointer;
   opacity: .9;
   transform: scale(1.3);
-  /* ✅ Желтая иконка */
+  
   color: #ffd93b;
   filter: brightness(1.2);
 }
@@ -725,12 +725,12 @@
   background: #2a1f14 url('assets/img/diplomat_leather.jpg') center/cover no-repeat; 
   border: 4px solid #3b2a1a; 
   border-radius: 16px; 
-  width: 480px;  /* ⬅️ Фиксированная ширина для 4 столбцов */
+  width: 480px;  
   max-height: 85vh; 
   z-index: 25; 
   box-shadow: inset 0 0 40px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5); 
   display: none;
-  overflow: hidden;  /* ⬅️ Запрет выхода за границы */
+  overflow: hidden;  
 }
 
 .inventory.open {
@@ -755,7 +755,7 @@
   font-size: 10px;
   color: #888;
   font-style: italic;
-  flex: 1; /* Растягивается между названием и очками */
+  flex: 1; 
 }
 
 .inventory-header .points {
@@ -763,43 +763,43 @@
   font-weight: bold;
   font-size: 16px;
   text-shadow: 0 0 10px rgba(255, 217, 59, 0.6);
-  white-space: nowrap; /* Не переносится */
+  white-space: nowrap; 
 }
 
 
 .grid {
   display: grid; 
-  grid-template-columns: repeat(5, 1fr);  /* ⬅️ 5 столбца */
+  grid-template-columns: repeat(5, 1fr);  
   gap: 8px; 
   padding: 12px;
 }
 
 .cell {
   border: 1px solid rgba(255,255,255,.08); 
-  aspect-ratio: 1/1;  /* ⬅️ Квадратная ячейка */
+  aspect-ratio: 1/1;  
   border-radius: 10px; 
-  display: flex;  /* ⬅️ Изменено с grid на flex */
-  align-items: center;  /* ⬅️ Центрирование по вертикали */
-  justify-content: center;  /* ⬅️ Центрирование по горизонтали */
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
   background: rgba(0,0,0,.15);
-  padding: 5px;  /* ⬅️ Небольшой отступ внутри */
+  padding: 5px;  
   box-sizing: border-box;
   position: relative;
 }
 
 .cell img {
-  max-width: 100%;  /* ⬅️ Изменено с 90% на 100% */
+  max-width: 100%;  
   max-height: 100%;
   width: auto;
   height: auto;
-  object-fit: contain;  /* ⬅️ КЛЮЧЕВОЕ — вписывает БЕЗ обрезки */
+  object-fit: contain; 
   object-position: center;
   display: block;
 }
 
 
 
-/* ✅ ЗАТЕМНЕНИЕ ФОНА */
+
 .ctx {
     position: fixed;
     left: 50%;
@@ -813,11 +813,11 @@
     padding: 16px;
     z-index: 40;
     box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-    pointer-events: auto; /* ← Добавь */
-    will-change: transform; /* ← Добавь для GPU */
+    pointer-events: auto; 
+    will-change: transform; 
 }
 
-/* ✅ ВАЖНО: Запрети влияние на layout */
+
 .ctx::before {
     content: '';
     position: fixed;
@@ -825,7 +825,7 @@
     background: rgba(0,0,0,0.6);
     z-index: -1;
     backdrop-filter: blur(4px);
-    pointer-events: none; /* ← Не влияет на клики */
+    pointer-events: none; 
 }
 
     .ctx h3{margin:0 0 6px; font-size:16px}
@@ -880,7 +880,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
   filter: drop-shadow(0 0 12px rgba(255,217,59,.75)) drop-shadow(0 0 24px rgba(255,217,59,.35));
 }
 
-/* ⬇️ ДОБАВЬ ЭТО: */
+
 .obj img {
   max-width: 12vw;
   width: auto; 
@@ -917,7 +917,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
   justify-content: flex-end;
 }
 
-/* Дисклеймер */
+
 .disclaimer {
     position: fixed;
     inset: 0;
@@ -934,11 +934,11 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
     opacity: 1;
 }
 
-/* Контейнер дисклеймера */
+
 .disclaimer-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Центрирование по горизонтали */
+  align-items: center; 
   text-align: center;
   gap: 20px;
 }
@@ -953,9 +953,9 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
 }
 
 .disclaimer-btn {
-  margin: 20px auto 0; /* Центр по горизонтали */
+  margin: 20px auto 0; 
   display: block;
-  opacity: 0; /* Скрыта по умолчанию */
+  opacity: 0; 
   transform: translateY(20px);
   transition: all 0.5s ease;
 }
@@ -967,8 +967,8 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
 }
 
 .disclaimer-btn:hover {
-    background: var(--accent);  /* ✅ Желтая при наведении */
-    color: #ffd93b;  /* ✅ Желтый текст при наведении */
+    background: var(--accent);  
+    color: #ffd93b;  
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 217, 59, 0.6);
 }
@@ -999,7 +999,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
   font-weight: bold;
   font-size: 14px;
   text-shadow: 0 0 10px rgba(255, 217, 59, 0.6);
-  margin-left: auto; /* Прижимает к правому краю */
+  margin-left: auto; 
 }
 
 .inventory-header .hint {
@@ -1008,7 +1008,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
   font-style: italic;
 }
 
-/* ========== ТАБЛИЦА ЛИДЕРОВ ========== */
+
 .leaderboard-modal {
   position: fixed;
   inset: 0;
@@ -1116,7 +1116,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
 
 
   </style>
-  <!-- Firebase SDK -->
+ 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
@@ -1140,7 +1140,7 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
     <span class="points" id="inventoryPoints">0 pts</span>
   </div>
   
-  <!-- ✅ ДОБАВЬ ЭТО: -->
+  
   <div class="grid" id="invGrid"></div>
 </div>
 
@@ -1172,18 +1172,18 @@ body:not(.menu-open) #scene, body:not(.menu-open) #hud, body:not(.menu-open) #di
 </div>
 <script>
 
-// ========== FIREBASE CONFIG ==========
+
 const firebaseConfig = {
-  apiKey: "AIzaSyC...",  // ← ВСТАВЬ СВОЙ
-  authDomain: "noir-game.firebaseapp.com",  // ← ВСТАВЬ СВОЙ
-  databaseURL: "https://matrix-noir-default-rtdb.europe-west1.firebasedatabase.app/",  // ← ВСТАВЬ СВОЙ
-  projectId: "noir-game",  // ← ВСТАВЬ СВОЙ
+  apiKey: "AIzaSyC...",  
+  authDomain: "noir-game.firebaseapp.com",  
+  databaseURL: "https://matrix-noir-default-rtdb.europe-west1.firebasedatabase.app/",  
+  projectId: "noir-game",  
   storageBucket: "noir-game.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abcdef123456"
 };
 
-// Инициализация Firebase
+
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
@@ -1191,7 +1191,7 @@ console.log('🔥 Firebase подключен!');
 
 
    
-// Функция печати текста с эффектом печатной машинки
+
 async function typeWriter(element, text, speed = 30) {
     element.textContent = '';
     for (let i = 0; i < text.length; i++) {
@@ -1200,39 +1200,39 @@ async function typeWriter(element, text, speed = 30) {
     }
 }
 
-// Показать дисклеймер
+
 async function showDisclaimer() {
     const disclaimer = document.getElementById('disclaimer');
     const disclaimerText = document.getElementById('disclaimerText');
     const disclaimerBtn = document.getElementById('disclaimerBtn');
     
-    // Показываем экран
+   
     disclaimer.style.display = 'flex';
     setTimeout(() => disclaimer.classList.add('show'), 50);
     
-    // Печатаем текст
+    
     await typeWriter(disclaimerText, DISCLAIMER_TEXT, 30);
     
-    // Показываем кнопку
+    
    
-// ✅ НОВОЕ (без setTimeout, сразу после typeWriter)
+
 disclaimerBtn.style.display = 'block';
 disclaimerBtn.style.opacity = '1';
 disclaimerBtn.style.transform = 'translateY(0)';
 console.log('✅ Кнопка показана');
  
-    // Обработчик кнопки
+    
     disclaimerBtn.onclick = () => {
-        // Сохраняем что дисклеймер показан
+       
         state.disclaimerShown = true;
         save();
         
-        // Скрываем дисклеймер
+       
         disclaimer.classList.remove('show');
         setTimeout(() => {
             disclaimer.style.display = 'none';
             
-            // Запускаем игру
+           
             closeMenu();
         }, 500);
     };
@@ -1240,8 +1240,8 @@ console.log('✅ Кнопка показана');
 
 const DIALOGS = {
   ep1: [
-    {"speaker":"Morpheus", "portrait": "assets/img/Morpheus.png", "textColor":"#00FF41", "text":"Wake up, Neo. The Matrix has you"},
-    {"speaker":"Morpheus", "portrait": "assets/img/Morpheus.png", "textColor":"#00FF41", "text":"Follow the white rabbit"},
+    {"speaker":"morpheus", "portrait": "assets/img/morpheus.png", "textColor":"#00FF41", "text":"Wake up, Neo. The Matrix has you"},
+    {"speaker":"morpheus", "portrait": "assets/img/morpheus.png", "textColor":"#00FF41", "text":"Follow the white rabbit"},
     {"speaker":"matrix","text":"Что? это шутка?"},
     {"speaker":"matrix","text":"Я же просто шел в честный офис..."},
     {"speaker":"matrix","text":"Утром я совсем разбитый. Пойду поищу молоко, такое же свежее, как наш председатель совета директоров каждую пятницу"},
@@ -1705,10 +1705,10 @@ const CONFIG = {
     title:'ДОБЕРМАН', desc:'да что здесь вообще происходит? откуда он там взялся?',
     sfx:{ click:'assets/audio/sfx_hover.mp3', take:'assets/audio/sfx_dmx.mp3' } },
 
-   // Сейф (закрытый по умолчанию)
+   
     { 
       id: 'safe', 
-      img: 'assets/img/vault_close2.png',  // ⚠️ Путь к твоему изображению
+      img: 'assets/img/vault_close2.png',  
       x: 150, 
       y: 170, 
       rarity: 'epic', 
@@ -1718,7 +1718,7 @@ const CONFIG = {
       title: 'Кодовый сейф', 
       desc: 'Старый сейф с кодовым замком. Интересно, что внутри?',
       zIndex: 10,  
-      interactive: true, // ⚠️ Важно! Делает объект интерактивным
+      interactive: true, 
       action: function() {
         if (state.safeCracked) {
           showMessage('Сейф уже открыт.');
@@ -1734,7 +1734,7 @@ const CONFIG = {
 
 
 
-  ], // ⬅️ Закрывающая скобка массива objects
+  ], 
 
   dialogue: DIALOGS.ep1
 };
@@ -1778,7 +1778,7 @@ function buildInventory() {
     im.alt = o.title; 
     im.title = o.title + ' (клик для просмотра 3D)';
     
-    // ⬇️ ДОБАВЛЯЕМ КЛИК ДЛЯ ОТКРЫТИЯ 3D
+    
     cell.style.cursor = 'pointer';
     cell.style.transition = 'transform 0.2s, box-shadow 0.2s';
     
@@ -1793,7 +1793,7 @@ function buildInventory() {
     };
     
     cell.onclick = () => {
-      playSfx('assets/audio/sfx_security.mp3');  // Звук клика
+      playSfx('assets/audio/sfx_security.mp3');  
       open3DViewer(o);
     };
     
@@ -1807,7 +1807,7 @@ let ctxEl = null;
 let isRendering = false;
 let renderCount = 0;
 
-// Глобальные переменные для фиксированных размеров
+
 let CACHED_SCENE_WIDTH = null;
 let CACHED_SCENE_HEIGHT = null;
 
@@ -1816,7 +1816,7 @@ function updateInventoryPoints() {
   
   if (!pointsElement) return;
   
-  // Обновляем отображение текущего счёта
+ 
   pointsElement.textContent = `${state.score} pts`;
   
   console.log('💰 Всего очков:', state.score);
@@ -1850,7 +1850,7 @@ function renderObjects() {
         const BASE_WIDTH = 1536;
         const BASE_HEIGHT = 1024;
         
-        // ✅ ИСПОЛЬЗУЕМ КЭШИРОВАННЫЕ размеры (зафиксированные при загрузке)
+        
         const sceneWidth = CACHED_SCENE_WIDTH || window.innerWidth;
         const sceneHeight = CACHED_SCENE_HEIGHT || window.innerHeight;
         
@@ -1869,7 +1869,7 @@ function renderObjects() {
         
         console.log(`⚙️ Scale: ${scale.toFixed(3)}, Offset: (${offsetX.toFixed(0)}, ${offsetY.toFixed(0)})`);
         
-        // Удаляем старые предметы
+        
         scene.querySelectorAll('.obj').forEach(n => n.remove());
         
     episodeObjects.forEach(o => {
@@ -1877,7 +1877,7 @@ function renderObjects() {
         console.log(`⏭️ Skip: ${o.id} (already taken)`);
         return;
     }
-    // ✅ Новый фильтр видимости
+    
     if (o.visible === false) {
         console.log(`🙈 Hidden: ${o.id} (visible === false)`);
         return;
@@ -1908,24 +1908,24 @@ function renderObjects() {
         im.style.transformOrigin = 'center center';
     }
     
-    // ✅ ИЗМЕНЕНО: События НА ИЗОБРАЖЕНИИ, а не на контейнере
+    
     im.addEventListener('mousedown', (e) => {
         playSfx(o.sfx?.click);
         if (state.editor) startDrag(e, o, wrap);
     });
     
-   // ✅ НОВЫЙ КОД
+   
 im.addEventListener('click', (e) => {
     if (state.editor) return;
     
-    // ✅ ПРОВЕРКА: Если у объекта есть action (для сейфа)
+    
     if (o.action && typeof o.action === 'function') {
         console.log('🎮 Вызов action для:', o.id);
-        o.action(); // Откроет мини-игру для сейфа
-        return; // Не открываем контекстное меню
+        o.action(); 
+        return; 
     }
     
-    // Обычное открытие контекстного меню
+    
     openContext(o, e.clientX, e.clientY);
 });
 
@@ -1935,25 +1935,25 @@ im.addEventListener('click', (e) => {
 });
 
 isRendering = false;
-console.log(`✅ ========== RENDER #${renderCount} END ==========`);
+console.log(`========== RENDER #${renderCount} END ==========`);
     
     }
 )}
 
 
 
-// ========== 3D VIEWER ==========
 
-let current3DScene = null;  // Для очистки сцены при закрытии
+
+let current3DScene = null;  
 
 function open3DViewer(obj) {
-  // Проверка наличия 3D-модели
+  
   if (!obj.model3d) {
     alert('У этого предмета пока нет 3D-модели 😔');
     return;
   }
   
-  // Создаём модальное окно
+ 
   const viewer = document.createElement('div');
   viewer.className = 'model-viewer open';
   viewer.id = 'modelViewer';
@@ -1969,15 +1969,15 @@ function open3DViewer(obj) {
   
   document.body.appendChild(viewer);
   
-  // Закрытие по кнопке
+  
   viewer.querySelector('.model-close').onclick = () => close3DViewer();
   
-  // Закрытие по клику на фон
+ 
   viewer.onclick = (e) => {
     if (e.target === viewer) close3DViewer();
   };
   
-  // Инициализация 3D
+  
   setTimeout(() => init3DModel(obj.model3d), 100);
 }
 
@@ -1987,7 +1987,7 @@ function close3DViewer() {
     viewer.remove();
   }
   
-  // Очистка Three.js сцены
+  
   if (current3DScene) {
     current3DScene.dispose();
     current3DScene = null;
@@ -1998,19 +1998,19 @@ async function init3DModel(modelPath) {
   const canvas = document.getElementById('modelCanvas');
   if (!canvas) return;
   
-  // Импортируем Three.js как ES-модули
+ 
   const THREE = await import('three');
   const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
   const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
   const { MeshoptDecoder } = await import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/meshopt_decoder.module.js');
   
-  console.log('✅ Three.js загружен');
+  console.log('Three.js загружен');
   
-  // Настройка сцены
+  
   const scene = new THREE.Scene();
   
   
-  // Камера
+  
   const camera = new THREE.PerspectiveCamera(
     50,
     canvas.offsetWidth / canvas.offsetHeight,
@@ -2019,7 +2019,7 @@ async function init3DModel(modelPath) {
   );
   camera.position.set(0, 1, 3);
   
-  // Рендерер
+ 
   const renderer = new THREE.WebGLRenderer({ 
     canvas, 
     antialias: true,
@@ -2028,9 +2028,9 @@ async function init3DModel(modelPath) {
   renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   
-  console.log('✅ Рендерер создан');
+  console.log('Рендерер создан');
   
-  // Освещение
+  
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
   scene.add(ambientLight);
   
@@ -2042,17 +2042,17 @@ async function init3DModel(modelPath) {
   directionalLight2.position.set(-5, -5, -5);
   scene.add(directionalLight2);
   
-  console.log('✅ Освещение добавлено');
+  console.log('Освещение добавлено');
   
-  // Загрузка модели
+  
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  console.log('🔄 Загрузка модели:', modelPath);
+  console.log('Загрузка модели:', modelPath);
   
   loader.load(
     modelPath,
     (gltf) => {
-      console.log('✅ Модель загружена!', gltf);
+      console.log('Модель загружена!', gltf);
       const model = gltf.scene;
       
       // Центрирование
@@ -2067,27 +2067,27 @@ async function init3DModel(modelPath) {
       model.scale.setScalar(scale);
       
       scene.add(model);
-      console.log('✅ Модель добавлена на сцену');
+      console.log('Модель добавлена на сцену');
     },
     (xhr) => {
       const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
-      console.log(`📥 Загрузка: ${percent}%`);
+      console.log(`Загрузка: ${percent}%`);
     },
     (error) => {
-      console.error('❌ Ошибка загрузки:', error);
+      console.error('Ошибка загрузки:', error);
       alert('Не удалось загрузить 3D-модель');
     }
   );
   
-  // Управление
+  
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 2;
   
-  console.log('✅ OrbitControls добавлены');
+  console.log('OrbitControls добавлены');
   
-  // Анимация
+  
   function animate() {
     requestAnimationFrame(animate);
     controls.update();
@@ -2095,16 +2095,16 @@ async function init3DModel(modelPath) {
   }
   animate();
   
-  console.log('✅ Рендеринг запущен');
+  console.log('Рендеринг запущен');
   
-  // Адаптивность
+  
   window.addEventListener('resize', () => {
     camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
   });
   
-  // Сохраняем для очистки
+  
   current3DScene = { 
     scene, 
     renderer, 
@@ -2124,7 +2124,7 @@ function openContext(obj, x, y){
   const d=document.createElement('div');
   d.className='ctx';
   
-  // ✅ ЦЕНТРИРУЕМ ОКНО
+ 
   
   d.style.transform='translate(-50%, -50%)';
   
@@ -2140,7 +2140,7 @@ function openContext(obj, x, y){
     if(act==='take'){
             console.log('🖱️ Take clicked for:', obj.id);
             takeObject(obj);
-            // closeContext() вызывается внутри takeObject()
+           
         }
     });
   document.body.appendChild(d);
@@ -2177,14 +2177,14 @@ function takeObject(obj) {
     console.log('🚪 Closing context...');
     closeContext();
     
-    // Небольшая задержка для корректного закрытия попапа
+    
     setTimeout(() => {
         console.log('🔄 Rendering objects...');
         renderObjects();
     }, 50);
     
     maybeShowGoldDigger();
-     console.log('✅ ========== TAKE COMPLETE ==========');
+     console.log('========== TAKE COMPLETE ==========');
 }
 function showScorePop(n){ const d=document.createElement('div'); d.className='score-pop'; d.textContent = `+${n}`; $('#app').appendChild(d); setTimeout(()=>d.remove(), 3000); }
 function showRarityBanner(rarity) {
@@ -2224,9 +2224,9 @@ function showRarityBanner(rarity) {
 
 
 function maybeShowGoldDigger() {
-  const totalItems = CONFIG.objects.length;  // ✅ Все предметы из всех эпизодов
+  const totalItems = CONFIG.objects.length;  
   
-  // ✅ Показываем только когда собраны ВСЕ предметы
+ 
   if (totalItems > 0 && state.taken.length >= totalItems) {
     const b = document.createElement('div'); 
     b.id='goldDiggerBanner'; 
@@ -2251,31 +2251,31 @@ function maybeShowGoldDigger() {
   }
 }
 
-// Плавный переход между эпизодами
+
 function fadeOutAndLoadEpisode(nextId, idx) {
-  console.log('🎬 Начало перехода на', nextId);
+  console.log('Начало перехода на', nextId);
   
   const overlay = document.getElementById('transitionOverlay');
   
-  // ✅ ШАГ 1: Затемнение (fade-out)
+  
   overlay.classList.add('active');
   
-  // ✅ ШАГ 2: Через 1 секунду (когда экран полностью чёрный) загружаем эпизод
+  
   setTimeout(() => {
     console.log('🔄 Загрузка эпизода', nextId);
     loadNextEpisode(nextId, idx);
     
-    // ✅ ШАГ 3: Через 0.5 сек после загрузки убираем затемнение (fade-in)
+   
     setTimeout(() => {
       console.log('✨ Показываем новый эпизод');
       overlay.classList.remove('active');
     }, 500);
-  }, 1000); // 1 секунда на fade-out
+  }, 1000); 
 }
 
 
 function getMatrixPortrait() {const p = CONFIG.persona.options[state.persona] || CONFIG.persona.options.classic;return p.portrait;}
-let currentTypeTimer = null; // ⬅️ Глобальная переменная
+let currentTypeTimer = null; 
 
 
 function typeText(text, color) {
@@ -2295,18 +2295,18 @@ function typeText(text, color) {
   dlgText.style.display = 'block';
   dlgText.style.visibility = 'visible';
   
-  // ✅ Устанавливаем цвет текста
+  
   if (color) {
     dlgText.style.color = color;
   } else {
     dlgText.style.color = 'var(--neon)';
   }
   
-  // ✅ Создаём временный div для парсинга HTML
+  
   const temp = document.createElement('div');
   temp.innerHTML = text;
   
-  // ✅ Получаем массив текстовых узлов и тегов
+  
   const nodes = Array.from(temp.childNodes);
   
   let currentIndex = 0;
@@ -2321,7 +2321,7 @@ function typeText(text, color) {
     
     const node = nodes[currentNodeIndex];
     
-    // Если это текстовый узел - печатаем посимвольно
+    
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent;
       if (currentIndex < text.length) {
@@ -2332,9 +2332,9 @@ function typeText(text, color) {
         currentNodeIndex++;
       }
     } 
-    // Если это HTML-элемент - добавляем целиком и начинаем печатать его содержимое
+   
     else if (node.nodeType === Node.ELEMENT_NODE) {
-      const clonedNode = node.cloneNode(false); // Копируем тег без содержимого
+      const clonedNode = node.cloneNode(false); 
       dlgText.appendChild(clonedNode);
       
       const innerText = node.textContent;
@@ -2353,30 +2353,29 @@ function typeText(text, color) {
     }
   }, 60);
 }
-// Конфигурация замка
-const DOOR_CODE = ['0', '4', '3']; // Код для открытия
-let pressedKeys = new Set(); // Зажатые кнопки
 
-// Открыть замок
+const DOOR_CODE = ['0', '4', '3']; 
+let pressedKeys = new Set(); 
+
+
 function showDoorLock() {
   const lock = document.getElementById('doorLock');
   lock.style.display = 'flex';
   
   pressedKeys.clear();
   
-  // Обработчики для мыши
+  
   document.querySelectorAll('.lock-btn').forEach(btn => {
     btn.addEventListener('mousedown', (e) => handlePress(e.target.dataset.digit));
     btn.addEventListener('mouseup', (e) => handleRelease(e.target.dataset.digit));
     btn.addEventListener('mouseleave', (e) => handleRelease(e.target.dataset.digit));
   });
   
-  // Обработчики для клавиатуры
+  
   document.addEventListener('keydown', handleKeyDown);
   document.addEventListener('keyup', handleKeyUp);
 }
 
-// Закрыть замок
 function closeDoorLock() {
   const lock = document.getElementById('doorLock');
   lock.style.display = 'none';
@@ -2385,11 +2384,11 @@ function closeDoorLock() {
   document.removeEventListener('keyup', handleKeyUp);
 }
 
-// Нажатие кнопки
+
 function handlePress(digit) {
   pressedKeys.add(digit);
   
-  // Визуальная активация
+  
   document.querySelectorAll(`.lock-btn[data-digit="${digit}"]`).forEach(btn => {
     btn.classList.add('pressed');
   });
@@ -2397,17 +2396,17 @@ function handlePress(digit) {
   checkCode();
 }
 
-// Отпускание кнопки
+
 function handleRelease(digit) {
   pressedKeys.delete(digit);
   
-  // Убрать визуальную активацию
+ 
   document.querySelectorAll(`.lock-btn[data-digit="${digit}"]`).forEach(btn => {
     btn.classList.remove('pressed');
   });
 }
 
-// Обработка клавиатуры
+
 function handleKeyDown(e) {
   const digit = e.key;
   if (/^[0-9]$/.test(digit) && !pressedKeys.has(digit)) {
@@ -2422,7 +2421,7 @@ function handleKeyUp(e) {
   }
 }
 
-// Проверка кода
+
 function checkCode() {
   const status = document.querySelector('.lock-status');
   
@@ -2430,18 +2429,18 @@ function checkCode() {
                     && pressedKeys.size === DOOR_CODE.length;
   
   if (isCorrect) {
-    status.textContent = '✅ Дверь открыта!';
+    status.textContent = 'Дверь открыта!';
     status.style.color = '#4ade80';
     
     setTimeout(() => {
       closeDoorLock();
       
-      // ✅ ЗАМЕНИЛИ на fadeOutAndLoadEpisode
+      
       const cur = CONFIG.episode.id;
       const idx = window.EP_ORDER.indexOf(cur);
       const nextId = window.EP_ORDER[idx + 1];
       
-      fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+      fadeOutAndLoadEpisode(nextId, idx); 
     }, 1000);
   }
 }
@@ -2451,8 +2450,7 @@ function checkCode() {
 function stepDialogue() {
    const currentDialogue = DIALOGS[CONFIG.episode.id] || CONFIG.dialogue;
   const node = currentDialogue ? currentDialogue[state.dialogueIndex] : null;
-  // ✅ ДОБАВИЛИ ПРОВЕРКУ НА КОФЕ-ИГРУ (ПЕРЕД ВСЕМ ОСТАЛЬНЫМ)
-  // ✅ ЛОГ ДЛЯ ОТЛАДКИ
+ 
   console.log('📍 stepDialogue вызван');
   console.log('Эпизод:', CONFIG.episode.id);
   console.log('Индекс:', state.dialogueIndex);
@@ -2470,12 +2468,12 @@ function stepDialogue() {
   const portrait = document.getElementById('portrait');
   
   if (!node) {
-    // Конец диалога — переход на следующий эпизод
+    
     if (dlgWrap) dlgWrap.style.display = 'none';
-    if (CONFIG.episode.id === 'ep2') {    // Для ep2 (или любого эпизода)
+    if (CONFIG.episode.id === 'ep2') {    
       console.log('🔒 Показываем замок');
       showDoorLock();
-      return; // Прерываем, не вызываем onEpisodeComplete
+      return; 
     }
     if (typeof window.onEpisodeComplete === 'function') {
       setTimeout(() => window.onEpisodeComplete(), 3000);
@@ -2500,14 +2498,14 @@ function stepDialogue() {
     });
     if (portrait) portrait.src = getMatrixPortrait();
   } else {
-    // ✅ ЗАМЕНИ ЭТУ СЕКЦИЮ:
+   
     if (portrait) {
       if (node.speaker === 'matrix') {
         portrait.src = getMatrixPortrait();
       } else if (node.portrait) {
-        portrait.src = node.portrait;  // ⬅️ Портрет NPC
+        portrait.src = node.portrait;  
       } else {
-        portrait.src = getMatrixPortrait();  // Дефолтный
+        portrait.src = getMatrixPortrait();  
       }
     }
     if (dlgText) dlgText.textContent = '';
@@ -2522,22 +2520,22 @@ function startDrag(e, obj, el){ drag.active=true; drag.el=el; drag.obj=obj; drag
 function onDrag(e) {
   if(!drag.active) return;
   
-  // ✅ Сохраняем временные координаты отдельно
+  
   const newX = e.clientX - drag.dx;
   const newY = e.clientY - drag.dy;
   
-  // ✅ Меняем только визуальное положение, НЕ исходные данные
+ 
   drag.el.style.left = newX + 'px';
   drag.el.style.top = newY + 'px';
   
-  // ✅ Обновляем объект только при остановке (в stopDrag)
+  
 }
 
 function stopDrag() {
     if (!drag.active) return;
     
     if (state.editor) {
-        // Пересчитываем обратно в базовые координаты
+        
         const BASE_WIDTH = 1536;
         const BASE_HEIGHT = 1024;
         
@@ -2554,24 +2552,24 @@ function stopDrag() {
         const offsetX = (sceneWidth - actualWidth) / 2;
         const offsetY = (sceneHeight - actualHeight) / 2;
         
-        // Текущие экранные координаты
+       
         const screenX = parseInt(drag.el.style.left);
         const screenY = parseInt(drag.el.style.top);
         
-        // Пересчитываем в базовые координаты фона
+        
         const baseX = Math.round((screenX - offsetX) / scale);
         const baseY = Math.round((screenY - offsetY) / scale);
         
-        // Обновляем в объекте
+        
         drag.obj.x = baseX;
         drag.obj.y = baseY;
         
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`📍 Предмет перемещён: ${drag.obj.id}`);
+        console.log(`Предмет перемещён: ${drag.obj.id}`);
         console.log(`   Экранные координаты: (${screenX}, ${screenY})`);
         console.log(`   Базовые координаты: (${baseX}, ${baseY})`);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📋 Скопируй в код:');
+        console.log('Скопируй в код:');
         console.log(`   x: ${baseX},`);
         console.log(`   y: ${baseY},`);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -2594,9 +2592,9 @@ function closeMenu() {
     
     loadScene();
     
-// ✅ КЭШИРУЕМ размеры окна ДО любых попапов
+
     setTimeout(() => {
-        cacheSceneDimensions(); // ← Сохраняем размеры
+        cacheSceneDimensions(); 
         renderObjects();
         
         const dlg = document.getElementById('dialog');
@@ -2616,18 +2614,18 @@ function closeMenu() {
 const PERSONA_ORDER = ['classic','vampire','lovelas'];
 function openPersonaCarousel(){const cur = state.persona || 'classic'; let idx = Math.max(0, PERSONA_ORDER.indexOf(cur));const modal = document.createElement('div'); modal.className='main-menu';modal.style.background = "center / cover no-repeat url('assets/img/pers_back.jpg')";const card = document.createElement('div'); card.className='menu-card'; card.style.maxWidth='560px';card.innerHTML = `<h1>Персонализация</h1><div style="position:relative;display:flex;align-items:center;justify-content:center;height:360px;overflow:hidden"><img id="pLeft"  style="position:absolute;right:57%;width:180px;opacity:.35;filter:grayscale(40%);border-radius:50%;border:2px solid rgba(0,0,0,.2);"><img id="pCenter" style="width:330px;border-radius:50%;"><img id="pRight" style="position:absolute;left:57%;width:180px;opacity:.35;filter:grayscale(40%);border-radius:50%;border:2px solid rgba(0,0,0,.2);"><button id="pPrev" class="btn" style="position:absolute;left:8px;top:calc(50% - 18px)">&larr;</button><button id="pNext" class="btn" style="position:absolute;right:8px;top:calc(50% - 18px)">&rarr;</button></div><div id="pName" style="text-align:center;font-weight:700;margin-top:4px"></div><div style="display:flex;justify-content:center;gap:12px;margin-top:10px"><button id="pChoose" class="btn">Выбрать</button><button id="pClose" class="btn">Закрыть</button></div>`;modal.appendChild(card); document.body.appendChild(modal);const pLeft = card.querySelector('#pLeft');const pCenter = card.querySelector('#pCenter');const pRight = card.querySelector('#pRight');const pName = card.querySelector('#pName');function at(i){ return CONFIG.persona.options[PERSONA_ORDER[(i+PERSONA_ORDER.length)%PERSONA_ORDER.length]]; }function render(playSfx = true){const left  = at(idx-1), mid = at(idx), right = at(idx+1);pLeft.src = left.portrait; pRight.src = right.portrait; pCenter.src = mid.portrait;pName.textContent = `${mid.name}`;if (playSfx && mid.sfx) { try{ new Audio(mid.sfx).play().catch(()=>{}); }catch{} }}render(true);card.querySelector('#pPrev').onclick = ()=>{ idx--; render(true); };card.querySelector('#pNext').onclick = ()=>{ idx++; render(true); };card.querySelector('#pChoose').onclick = ()=>{const choice = PERSONA_ORDER[(idx+PERSONA_ORDER.length)%PERSONA_ORDER.length];state.persona = choice; save(); alert(CONFIG.persona.options[choice].desc || 'Выбран облик.'); modal.remove();};card.querySelector('#pClose').onclick = ()=> modal.remove();}
 function openInventoryModal() {
-    console.log('🎒 Открытие инвентаря');
+    console.log('Открытие инвентаря');
     
-    // ✅ Проверяем уже открыта?
+    
     let modal = document.querySelector('.main-menu.inventory-modal');
     if (modal) {
-        console.log('⚠️ Инвентарь уже открыт');
+        console.log('Инвентарь уже открыт');
         return;
     }
     
-    // Создаём новую модалку
+    
     modal = document.createElement('div');
-    modal.className = 'main-menu inventory-modal'; // ✅ Добавили маркер
+    modal.className = 'main-menu inventory-modal'; 
     
     const card = document.createElement('div');
     card.className = 'menu-card';
@@ -2649,7 +2647,7 @@ function openInventoryModal() {
     modal.appendChild(card);
     document.body.appendChild(modal);
     
-    // Заполняем ячейки
+    
     const g = card.querySelector('#invModalGrid');
     const cells = CONFIG.inventory.cols * CONFIG.inventory.rows;
     for (let i = 0; i < cells; i++) {
@@ -2666,7 +2664,7 @@ function openInventoryModal() {
         cell.appendChild(im);
     });
     
-    console.log('✅ Инвентарь открыт');
+    console.log('Инвентарь открыт');
 }
 
 
@@ -2675,7 +2673,7 @@ function openEpisodesModal(){const modal=document.createElement('div'); modal.cl
 function openAbout(){const modal=document.createElement('div'); modal.className='main-menu';const card=document.createElement('div'); card.className='menu-card';card.innerHTML = `<h1>Об авторе</h1><p>Никита Олюшин — консультант-аналитик в ТГ «Фарма».</p><p>Для связи: <a href="https://t.me/himyusernameis" target="_blank" style="color:#ffd93b; text-decoration:none;">@himyusernameis</a> (Telegram).</p><p>Донаты не принимаются ни в каком виде, <u>ни под каким предлогом</u></p>`;const close=document.createElement('button'); close.className='btn'; close.textContent='Закрыть'; close.onclick=()=>modal.remove();card.appendChild(close); modal.appendChild(card); document.body.appendChild(modal);}
 
 
-// Текст дисклеймера
+
 const DISCLAIMER_TEXT = `⚠️  ДИСКЛЕЙМЕР  ⚠️ 
 
 Это произведение является вымышленным.
@@ -2687,13 +2685,13 @@ const DISCLAIMER_TEXT = `⚠️  ДИСКЛЕЙМЕР  ⚠️
 Продолжая игру, вы подтверждаете, что ознакомлены
 с данным предупреждением.`;
 
-// Функция печатающего текста
+
 function typeWriter(element, text, speed = 30) {
     return new Promise((resolve) => {
         let i = 0;
         element.innerHTML = '';
         
-        // Заменяем все \n на <br>
+       
         const html = text.replace(/\n/g, '<br>');
         
         function type() {
@@ -2711,9 +2709,9 @@ function typeWriter(element, text, speed = 30) {
 }
 
 
-// Сохранение результата в Firebase
+
 function saveResultToFirebase() {
-  // Не сохраняем пустые результаты
+  
   if (state.score <= 0) {
     console.log('⏭️ Пропуск: нет очков для сохранения');
     return;
@@ -2726,7 +2724,7 @@ function saveResultToFirebase() {
 
   console.log('💾 Ищу запись для никнейма:', state.nickname);
 
-  // Ищем существующую запись с этим никнеймом
+ 
   database.ref('leaderboard')
     .orderByChild('nickname')
     .equalTo(state.nickname)
@@ -2741,7 +2739,7 @@ function saveResultToFirebase() {
       };
 
       if (snapshot.exists()) {
-        // Запись найдена — обновляем если новый счёт выше
+       
         let existingKey = null;
         let existingScore = 0;
 
@@ -2751,7 +2749,7 @@ function saveResultToFirebase() {
         });
 
         if (state.score > existingScore) {
-          // Обновляем запись
+         
           console.log(`🔄 Обновляю рекорд: ${existingScore} → ${state.score}`);
           database.ref('leaderboard/' + existingKey).update(result)
             .then(() => console.log('✅ Рекорд обновлён!'))
@@ -2760,7 +2758,7 @@ function saveResultToFirebase() {
           console.log(`⏭️ Рекорд не побит (текущий: ${existingScore}, новый: ${state.score})`);
         }
       } else {
-        // Записи нет — создаём новую
+        
         console.log('➕ Создаю новую запись');
         database.ref('leaderboard').push(result)
           .then(() => console.log('✅ Результат сохранён!'))
@@ -2772,13 +2770,13 @@ function saveResultToFirebase() {
     });
 }
 
-// Загрузка таблицы лидеров
+
 function loadLeaderboard() {
   console.log('📊 Загружаю таблицу лидеров...');
 
   database.ref('leaderboard')
     .orderByChild('score')
-    .limitToLast(20)  // Топ-20 игроков
+    .limitToLast(30)  
     .once('value')
     .then((snapshot) => {
       const leaders = [];
@@ -2787,7 +2785,7 @@ function loadLeaderboard() {
         leaders.push(childSnapshot.val());
       });
 
-      // Сортируем по убыванию score
+     
       leaders.reverse();
 
       console.log('✅ Загружено игроков:', leaders.length);
@@ -2798,9 +2796,9 @@ function loadLeaderboard() {
       alert('Ошибка загрузки таблицы: ' + error.message);
     });
 }
-// Отображение таблицы лидеров
+
 function displayLeaderboard(leaders) {
-  // Находим контейнер для таблицы (нужно будет создать в HTML)
+
   let leaderboardDiv = document.getElementById('leaderboardContent');
   
   if (!leaderboardDiv) {
@@ -2839,7 +2837,7 @@ function displayLeaderboard(leaders) {
   leaderboardDiv.innerHTML = html;
 }
 
-// Загрузка сохранения
+
 function load() {
     const s = localStorage.getItem('noirGameState');
     if (!s) return;
@@ -2855,18 +2853,15 @@ function load() {
     }
 }
 
-// Вызови загрузку при старте
+
 load();
 
-// ========================================
-// МИНИ-ИГРА: ВЗЛОМ СЕЙФА
-// ========================================
 
-let safeCombination = [6, 7, 5]; // Правильная комбинация
-let currentPosition = 0; // Текущая активная позиция (0, 1, 2)
-let userCombination = [0, 0, 0]; // Введённые пользователем цифры
+let safeCombination = [6, 7, 5]; 
+let currentPosition = 0; 
+let userCombination = [0, 0, 0]; 
 
-// Открыть окно взлома сейфа
+
 function openSafeCrackGame() {
     console.log('🔓 Открываю мини-игру взлома сейфа');
     
@@ -2878,22 +2873,22 @@ function openSafeCrackGame() {
     
     overlay.style.display = 'flex';
     
-    // Сброс значений
+   
     currentPosition = 0;
     userCombination = [0, 0, 0];
     
     updateDigitDisplays();
     highlightActiveDigit();
     
-    // Привязываем события
+    
     setupSafeGameEvents();
 }
 
-// Настройка событий
+
 function setupSafeGameEvents() {
     console.log('⚙️ Настройка событий мини-игры');
     
-    // Кнопки стрелок вверх/вниз
+    
     document.querySelectorAll('.disk-arrow').forEach(arrow => {
         arrow.onclick = (e) => {
             e.stopPropagation();
@@ -2908,7 +2903,7 @@ function setupSafeGameEvents() {
         };
     });
     
-    // Клик по цифрам для выбора позиции
+    
     document.querySelectorAll('.digit-display').forEach((digit, index) => {
         digit.onclick = () => {
             console.log('🔘 Выбрана позиция:', index);
@@ -2918,7 +2913,7 @@ function setupSafeGameEvents() {
         };
     });
     
-    // Кнопка "Открыть"
+    
     const submitBtn = document.getElementById('safeCrackSubmit');
     if (submitBtn) {
         submitBtn.onclick = () => {
@@ -2927,7 +2922,7 @@ function setupSafeGameEvents() {
         };
     }
     
-    // Кнопка "Закрыть"
+    
     const closeBtn = document.getElementById('safeCrackClose');
     if (closeBtn) {
         closeBtn.onclick = () => {
@@ -2936,7 +2931,7 @@ function setupSafeGameEvents() {
         };
     }
     
-    // Закрытие по клику на overlay
+   
     const overlay = document.getElementById('safeCrackOverlay');
     overlay.onclick = (e) => {
         if (e.target === overlay) {
@@ -2945,27 +2940,27 @@ function setupSafeGameEvents() {
     };
 }
 
-// Изменить значение диска
+
 function changeDiskValue(diskIndex, delta) {
     userCombination[diskIndex] = (userCombination[diskIndex] + delta + 10) % 10;
     updateDigitDisplays();
     console.log('📊 Комбинация:', userCombination);
 }
 
-// Закрыть окно
+
 function closeSafeCrackGame() {
     console.log('❌ Закрываю мини-игру');
     document.getElementById('safeCrackOverlay').style.display = 'none';
 }
 
-// Обновить отображение цифр
+
 function updateDigitDisplays() {
     document.getElementById('digit1').textContent = userCombination[0];
     document.getElementById('digit2').textContent = userCombination[1];
     document.getElementById('digit3').textContent = userCombination[2];
 }
 
-// Подсветка активной позиции
+
 function highlightActiveDigit() {
     const digits = document.querySelectorAll('.digit-display');
     
@@ -2978,7 +2973,7 @@ function highlightActiveDigit() {
     });
 }
 
-// Проверка комбинации
+
 function checkSafeCombination() {
     console.log('🔍 Проверка комбинации:', userCombination, 'vs', safeCombination);
     
@@ -3003,7 +2998,7 @@ function checkSafeCombination() {
     }
 }
 
-// Успешный взлом
+
 function onSafeCracked() {
     console.log('✅ Сейф взломан!');
     if (state.safeCracked) {
@@ -3014,56 +3009,54 @@ function onSafeCracked() {
     console.log('💾 state.dialogueIndex:', state.dialogueIndex);
     console.log('📊 CONFIG.dialogue.length:', CONFIG.dialogue.length);
     
-    // Сохраняем состояние
+ 
     state.safeCracked = true;
     save();
     
-    // Закрываем окно
+   
     closeSafeCrackGame();
     
-    // Меняем спрайт сейфа
+   
     const safeObj = CONFIG.objects.find(obj => obj.id === 'safe' && obj.episode === 'ep6');
     if (safeObj) {
         safeObj.img = 'assets/img/vault_open3.png';
-        // ✅ ФИКСИРОВАННЫЙ РАЗМЕР ДЛЯ ОТКРЫТОГО СЕЙФА
-    safeObj.scale = 1.1; // Подбери нужный размер
+       
+    safeObj.scale = 1.1; 
     console.log('🔄 Сейф открыт, scale установлен:', safeObj.scale);
 
     }
     
     
-    // Показываем презерватив внутри
+    
 const condomObj = CONFIG.objects.find(
   obj => obj.id === 'Контроцептив' && obj.episode === 'ep6'
 );
 if (condomObj) {
-  condomObj.visible = true; // ✅ станет виден только после взлома
+  condomObj.visible = true; 
 }
 
     
-    // Перерисовываем сцену
+    
     renderObjects();
 
    
-    // Сообщение
-   // showMessage('Сейф открыт! Внутри лежит.....');
+    
     alert('Сейф открыт! Внутри лежит контрацептив...');
-    // Звук открытия
-    playSfx('assets/audio/sfx_you_win.mp3');
+      playSfx('assets/audio/sfx_you_win.mp3');
 
-// ✅ Проверяем что мы в эпизоде 6
+
 if (CONFIG.episode.id === 'ep6') {
   console.log('🔁 Сейф взломан, запускаем переход на эпизод 7');
   
   setTimeout(() => {
     window.onEpisodeComplete();
-  }, 7000); // 3 секунды чтобы увидеть открытый сейф и сообщение
+  }, 7000); 
 }
 
 }
 
 
-// Привязка событий к окну сейфа
+
 function initSafeCrackEvents() {
     // Скролл на колесе
     const diskWheel = $('#diskWheel');
@@ -3101,12 +3094,12 @@ const COFFEE_RECIPE = {
   order: ['coffee', 'water', 'milk', 'cinnamon', 'syrup'],
   images: {
     0: 'assets/img/coffe_cup_empty.png',
-    1: 'assets/img/coffe_cup_coffee.png',      // Только кофе
+    1: 'assets/img/coffe_cup_coffee.png',      
     2: 'assets/img/coffe_cup_coffee.png',
-    3: 'assets/img/coffe_cup_milk.png',        // Кофе + вода
-    4: 'assets/img/coffe_cup_cinnamon.png',    // + корица
-    5: 'assets/img/coffe_cup_syrup.png',       // + сироп
-    6: 'assets/img/coffe_cup_syrup.png'     // Готовый латте
+    3: 'assets/img/coffe_cup_milk.png',        
+    4: 'assets/img/coffe_cup_cinnamon.png',    
+    5: 'assets/img/coffe_cup_syrup.png',       
+    6: 'assets/img/coffe_cup_syrup.png'     
   },
   names: {
     coffee: 'кофе',
@@ -3123,14 +3116,14 @@ let coffeeState = {
   currentStep: 0
 };
 
-// Открыть кофе-игру
+
 function showCoffeeGame() {
   console.log('☕ Открытие кофе-машины');
   
   const game = document.getElementById('coffeeGame');
   game.style.display = 'flex';
   
-  // Сброс состояния
+  
   coffeeState.added = [];
   coffeeState.currentStep = 0;
   
@@ -3138,12 +3131,12 @@ function showCoffeeGame() {
   updateProgress();
   updateHint();
   
-  // Сброс ингредиентов
+  
   document.querySelectorAll('.ingredient').forEach(ing => {
     ing.classList.remove('used');
   });
   
-  // Drag-and-drop обработчики
+  
   const cupArea = document.querySelector('.coffee-cup-area');
   const ingredients = document.querySelectorAll('.ingredient');
   
@@ -3157,13 +3150,13 @@ function showCoffeeGame() {
   cupArea.addEventListener('drop', handleDrop);
 }
 
-// Закрыть кофе-игру
+
 function closeCoffeeGame() {
   const game = document.getElementById('coffeeGame');
   game.style.display = 'none';
 }
 
-// Обработчики drag-and-drop
+
 let draggedIngredient = null;
 
 function handleDragStart(e) {
@@ -3196,7 +3189,7 @@ function handleDrop(e) {
   
   if (!draggedIngredient) return;
   
-  // ✅ ПРОВЕРКА ПРАВИЛЬНОГО ПОРЯДКА
+  
   const expectedIngredient = COFFEE_RECIPE.order[coffeeState.currentStep];
   
   if (draggedIngredient !== expectedIngredient) {
@@ -3205,21 +3198,21 @@ function handleDrop(e) {
     return;
   }
   
-  // ✅ Добавляем ингредиент
+  
   console.log('✅ Добавлен:', draggedIngredient);
   coffeeState.added.push(draggedIngredient);
   coffeeState.currentStep++;
   
-  // Отмечаем как использованный
+  
   const ingElement = document.querySelector(`.ingredient[data-ingredient="${draggedIngredient}"]`);
   if (ingElement) ingElement.classList.add('used');
   
-  // Обновляем стаканчик
+  
   updateCoffeeCup();
   updateProgress();
   updateHint();
   
-  // Проверка завершения
+  
   if (coffeeState.currentStep === 5) {
     setTimeout(() => {
       completeCoffeeGame();
@@ -3229,22 +3222,22 @@ function handleDrop(e) {
   draggedIngredient = null;
 }
 
-// Обновить изображение стаканчика
+
 function updateCoffeeCup() {
   const cup = document.getElementById('coffeeCup');
   const step = coffeeState.currentStep;
   
-  // Анимация наливания
+  
   cup.classList.add('pour');
   setTimeout(() => cup.classList.remove('pour'), 500);
   
-  // Смена изображения по шагу
+ 
   cup.src = COFFEE_RECIPE.images[step];
   
   console.log('☕ Шаг:', step, 'PNG:', cup.src);
 }
 
-// Обновить прогресс
+
 function updateProgress() {
   const progress = document.getElementById('coffeeProgress');
   progress.textContent = `${coffeeState.currentStep}/5`;
@@ -3257,7 +3250,7 @@ function updateProgress() {
   }
 }
 
-// Обновить подсказку
+
 function updateHint() {
   const hint = document.querySelector('.coffee-hint');
   
@@ -3271,7 +3264,7 @@ function updateHint() {
   }
 }
 
-// Показать ошибку
+
 function showError(text) {
   const hint = document.querySelector('.coffee-hint');
   const originalText = hint.textContent;
@@ -3280,7 +3273,7 @@ function showError(text) {
   hint.textContent = '❌ ' + text;
   hint.style.color = '#ff6b6b';
   
-  // Встряхивание стаканчика
+  
   const cup = document.getElementById('coffeeCup');
   cup.style.animation = 'shake 0.4s ease';
   
@@ -3291,7 +3284,7 @@ function showError(text) {
   }, 1500);
 }
 
-// Завершение игры
+
 function completeCoffeeGame() {
   console.log('🎉 Кофе готов!');
   
@@ -3301,11 +3294,11 @@ function completeCoffeeGame() {
   hint.style.fontSize = '18px';
   hint.style.fontWeight = 'bold';
   
-  // Закрытие через 2 сек
+  
   setTimeout(() => {
     closeCoffeeGame();
     
-    // Продолжаем диалог
+   
     state.dialogueIndex++;
     save();
     stepDialogue();
@@ -3316,7 +3309,7 @@ function completeCoffeeGame() {
 
 
 function wireUI() {
-    // Кнопка "Продолжить"
+   
     const btnContinue = document.getElementById('btnContinue');
     if (btnContinue) {
         btnContinue.onclick = () => {
@@ -3334,14 +3327,14 @@ if (btnNew) {
   btnNew.onclick = async () => {
     if (!confirm('Начать новую игру?')) return;
     
-    // Получаем никнейм из поля
+    
     const nickInput = document.getElementById('nickname');
     const n = (nickInput?.value || state.nickname || 'Player').trim();
     if (!validNick(n)) return alert('Ник: латиница/цифры/_ , 3–16');
     
     console.log('🎮 Новая игра начата');
     
-    // Сброс состояния 
+    
     state.nickname = n;
     state.score = 0;
     state.taken = [];
@@ -3367,7 +3360,7 @@ if (btnNew) {
   };
 }
   
-    // Остальные кнопки
+    
     initSafeCrackEvents();
     
     const btnPersona = document.getElementById('btnPersona');
@@ -3396,9 +3389,9 @@ if (btnNew) {
         };
     }
     
-    // Глобальный клик (оставляем addEventListener, т.к. это window)
+    
     window.addEventListener('click', (e) => {
-        // Игнорируем клики по кнопкам, контексту и объектам
+      
         if (e.target.closest('.btn') || e.target.closest('.ctx') || e.target.closest('.obj')) {
             return;
         }
@@ -3434,7 +3427,7 @@ if (btnLeaders) {
   console.log('✅ Кнопка "Таблица лидеров" подключена');
 }
 }
-// Вызов ОДИН РАЗ при загрузке
+
 window.addEventListener('DOMContentLoaded', () => {
     wireUI();
 });
@@ -3445,7 +3438,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Кнопка "Звук"
 let soundEnabled = true;
 document.getElementById('btnSound')?.addEventListener('click', (e) => {
   soundEnabled = !soundEnabled;
@@ -3455,7 +3447,7 @@ document.getElementById('btnSound')?.addEventListener('click', (e) => {
 
 function init(){document.body.classList.add('menu-open');loadScene(); buildInventory(); renderObjects();wireUI();openMenu();}
 document.addEventListener('DOMContentLoaded', init);
-// Переход на следующую реплику по клику или пробелу
+
 let dialogueReady = false;
 document.addEventListener('click', (e) => {
   if (e.target.closest('#dialog') && !e.target.closest('.btn') && !e.target.closest('.choices')) {
@@ -3475,14 +3467,14 @@ document.addEventListener('keydown', (e) => {
     const node = CONFIG.dialogue[state.dialogueIndex];
     if (!node || node.choices) return;
     
-    // ✅ Если текст печатается — показываем мгновенно
+   
     if (currentTypeTimer) {
       clearInterval(currentTypeTimer);
       currentTypeTimer = null;
       const dlgText = document.getElementById('dialogText');
       if (dlgText) dlgText.textContent = node.text;
     } else {
-      // ✅ Если текст допечатан — переход на следующий
+      
       state.dialogueIndex++;
       save();
       stepDialogue();
@@ -3490,10 +3482,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-
-// ========================================
-// ПРОВЕРКА ЗАВЕРШЕНИЯ ЭПИЗОДА 6
-// ========================================
 
 
 function checkEpisode6Complete() {
@@ -3513,7 +3501,7 @@ function checkEpisode6Complete() {
 
   if (allDialoguesHeard && !safeCracked) {
 
-  alert('Матрикс: Я обязан вскрыть этот сейф и узнать, что там находится.'); // временно
+  alert('Матрикс: Я обязан вскрыть этот сейф и узнать, что там находится.'); 
   return false;
 }
 
@@ -3535,7 +3523,7 @@ window.onEpisodeComplete = function(){
   
   console.log('➡️ Next episode:', nextId);
   
-  // ✅ ПРОВЕРКА ДЛЯ ПОСЛЕДНЕГО ЭПИЗОДА
+  
   if (!nextId) {
     console.log('🎉 Игра завершена! Возврат в главное меню');
     
@@ -3543,21 +3531,21 @@ window.onEpisodeComplete = function(){
     overlay.classList.add('active'); // Затемнение
     
     setTimeout(() => {
-      // Возврат в главное меню
-      location.reload(); // ← Или вызови функцию главного меню
-    }, 1500); // 1.5 секунды на затемнение
+    
+      location.reload(); 
+    }, 1500); 
     
     return;
   }
 
-  // ✅ ПРОВЕРКА ДЛЯ ЭПИЗОДА 2 (ЗАМОК)
+  
   if (cur === 'ep2') {
     console.log('🔒 Эпизод 2 завершён, показываем замок');
     showDoorLock();
     return;
   }
   
-  // ✅ ПРОВЕРКА ДЛЯ ЭПИЗОДА 6
+  
   if (cur === 'ep6') {
     if (!checkEpisode6Complete()) {
       console.log('⚠️ Эпизод 6: сейф не вскрыт, блокируем переход');
@@ -3566,17 +3554,17 @@ window.onEpisodeComplete = function(){
     
     console.log('⏳ Ждём 5 секунд перед переходом на ep7...');
     setTimeout(() => {
-      fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+      fadeOutAndLoadEpisode(nextId, idx); 
     }, 5000);
     
     return;
   }
   
-  // ✅ Обычный переход для других эпизодов
-  fadeOutAndLoadEpisode(nextId, idx); // ← ЗАМЕНИЛИ
+  
+  fadeOutAndLoadEpisode(nextId, idx);
 };
 
-// ✅ ВЫНЕСЛИ ЛОГИКУ ЗАГРУЗКИ В ОТДЕЛЬНУЮ ФУНКЦИЮ (чтобы не дублировать)
+
 function loadNextEpisode(nextId, idx) {
   if (nextId && DIALOGS[nextId]) {
     console.log('✅ Переход на эпизод:', nextId);
@@ -3617,7 +3605,7 @@ function loadNextEpisode(nextId, idx) {
 
 
 
-// ✅ Конфигурация всех эпизодов
+// Конфигурация всех эпизодов
 if(typeof window.EPCONFIG === 'undefined'){
   window.EPCONFIG = {
     ep1: { 
@@ -3681,35 +3669,35 @@ if(typeof window.EPCONFIG === 'undefined'){
 }
 
 
-// ✅ Функция быстрого перехода на эпизод
+// Функция быстрого перехода на эпизод
 window.startEpisode = function(epId){
   epId = epId || 'ep1';
   
-  // Находим конфиг эпизода
+  
   const ep = window.EPCONFIG ? window.EPCONFIG[epId] : null;
   if(!ep) {
     console.error('Эпизод не найден:', epId);
     return;
   }
   
-  // Обновляем CONFIG
+ 
   CONFIG.episode.id = ep.id;
   CONFIG.episode.title = ep.title;
   CONFIG.episode.bg = ep.bg;
   CONFIG.episode.music = ep.music;
   CONFIG.dialogue = ep.dlg;
   
-  // Сбрасываем диалог
+  
   if(window.state) state.dialogueIndex = 0;
   
-  // Закрываем меню
+  
   const m = document.getElementById('mainMenu');
   if(m) {
     m.hidden = true;
     document.body.classList.remove('menu-open');
   }
   
-  // Перезагружаем сцену
+  
   loadScene();
   renderObjects();
   buildInventory();
@@ -3725,25 +3713,23 @@ window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
         console.log('🔄 Window resized, updating cache...');
-        cacheSceneDimensions(); // ← Обновляем кэш при реальном resize
+        cacheSceneDimensions(); 
         renderObjects();
     }, 100);
 });
 
-// ========== УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ==========
 
-// Открытие таблицы лидеров
 function openLeaderboard() {
   console.log('📊 Открываю таблицу лидеров');
   
   const modal = document.getElementById('leaderboardModal');
   if (modal) {
     modal.style.display = 'flex';
-    loadLeaderboard(); // Загружаем данные
+    loadLeaderboard(); 
   }
 }
 
-// Закрытие таблицы лидеров
+
 function closeLeaderboard() {
   console.log('❌ Закрываю таблицу лидеров');
   
